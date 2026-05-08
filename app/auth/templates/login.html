@@ -1,0 +1,37 @@
+{% extends 'auth-base.html'%}
+
+{% block title %} Login {% endblock %}
+
+{% block content %} 
+    <form action="/auth/login" method="post" id="form">
+        {{ form.hidden_tag() }}
+
+        <div class="input-div form-group mb-3">
+            {{ form.email.label }}
+            {{ form.email(class_="form-control") }}
+            {% for err in form.email.errors %}
+                <span class="error">{{ err }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="input-div form-group mb-3">
+            {{ form.password.label }}
+            {{ form.password(class_="form-control") }}
+            {% for err in form.password.errors %}
+                <span class="error">{{ err }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="submit-btn p-3">
+            {{ form.submit(class_="btn btn-primary") }}
+        </div>
+    </form>
+
+    <p>
+        <a href="{{ url_for('auth.forget_password') }}">Forget Password?</a>
+    </p>
+    <p> Didn't register? 
+        <a href="{{ url_for('auth.register') }}">Register</a> |
+        <a href="{{ url_for('admin.login') }}">Admin?</a>
+    </p>
+{% endblock %}

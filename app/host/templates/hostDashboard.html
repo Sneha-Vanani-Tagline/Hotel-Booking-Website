@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block adminName %} 
+    - {{ current_user.name }}
+{% endblock %}
+
+{% block content %}
+    {% if current_user %}
+        {% set host = current_user %}
+
+        <div class="stats d-flex gap-4 text-center">
+            
+                <a href="{{ url_for('hotel.list') }}">
+                    <div class="card p-3" style="width: 12rem;">Total Hotels
+                        <span class="fs-3">
+                            {% if hotels %}
+                                {{ hotels }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </span>
+                    </div> 
+                </a>
+
+                <a href="{{ url_for('room.roomlist') }}">
+                    <div class="card p-3" style="width: 12rem;">Total rooms
+                        <span class="fs-3">
+                            {% if rooms %}
+                                {{ rooms }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </span>
+                    </div> 
+                </a>
+
+                <a href="{{ url_for('booking.allBookings') }}">
+                    <div class="card p-3" style="width: 12rem;">Total Active Bookings
+                        <span class="fs-3">
+                            {% if bookings %}
+                                {{ bookings }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </span>
+                    </div> 
+                </a>
+        
+        </div>
+    {% endif %}
+{% endblock %}

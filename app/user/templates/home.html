@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if cityWise_room %}
+        {% for city in cityWise_room %}
+            <a href="{{ url_for('user.rooms', city=city) }}" style="color: black;">
+                <h3 class="mb-2 text-capitalize"> {{ city }} </h3>
+            </a>
+
+            <div class="row d-flex flex-row mb-3">
+                {% for room in cityWise_room[city] %}
+                    <div class="room-card-container me-3" style="width: 18rem;">
+                        <a href="{{ url_for('user.room', rid=room.id) }}" class="card">
+                            {% if roomImg %}
+                                {% for rid in roomImg %}
+                                    {% if rid == room.id %} 
+                                        <img src="{{ url_for('static', filename='images/rooms/' + roomImg[rid]) }}" class="card-img-top" alt="room image">
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-text text-capitalize">{{ room.category }}</h5>
+                                <p>Price: {{ room.price_per_night }}/night</p>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endblock %}
+

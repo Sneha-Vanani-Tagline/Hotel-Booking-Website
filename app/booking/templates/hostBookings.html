@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+
+{% block adminName %} 
+    - {{ current_user.name }}
+{% endblock %}
+
+{% block content %}
+    {% if hostUser %}
+        {% if hotels %}
+
+            {% for hotel in hotels %}
+                <div class="mb-4">
+                    <h2>{{ hotel.name }}</h2>
+
+                    {% set bookings = hotel.bookings %}
+                    <!-- table card -->
+                    <div class="card shadow-sm p-0">
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Booker</th>
+                                            <th>Room</th>
+                                            <th>Total Guest</th>
+                                            <th>Check-in</th>
+                                            <th>Check-out</th>
+                                            <th>Price</th>
+                                            <th>Booking Date</th>
+                                            <th>Status</th>
+                                            <th class="text-end">Actions</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {% for b in bookings %}
+                                            <tr class="text-capitalize">
+                                                <td>#{{ b.id }}</td>
+                                                <td>{{ b.user.name }}</td>
+                                                <td>{{ b.rooms.category }}</td>
+                                                <td>{{ b.guest }}</td>
+                                                <td>{{ b.date_of_arrival }}</td>
+                                                <td>{{ b.date_of_departure }}</td>
+                                                <td>{{ b.total_price }}</td>
+                                                <td>{{ b.booking_date }}</td>
+
+                                                {% if b.status == 'confirmed' %}
+                                                    <td>
+                                                        <span class="badge bg-success">{{ b.status }}</span>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <a href="#" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal-{{ b.id }}">Cancel</a>
+                                                    </td>
+                                        
+                                                {% elif b.status == 'cancelled' %}
+                                                    <td><span class="badge bg-danger">Cancelled</span></td>
+                                                    <td class="text-end">
+                                                        <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#viewModal-{{ b.id }}">View Reason</button>
+                                                    </td>
+                                                {% endif %}
+                                            </tr>
+
+
+                                            <!-- Modal: on cancel click -->
+                                            <div class="modal fade" id="cancelModal-{{ b.id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="cancelModalLabel">Booking Cancelation</h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <!-- form -->
+                                                    <form action="{{ url_for('booking.allBookings')}}" method="post">
+                                                        <div class="modal-body">
+                                                            <h5 class="modal-title fs-6 text-capitalize mb-1" id="cancelModalLabel">{{ b.rooms.category }} - {{ b.user.name }}</h5>
+
+                                                            <input type="hidden" value="{{ b.id }}" name="bookingid">
+                                                            <label for="cancel_reason" class="form-label">Reason</label>
+                                                            <textarea name="cancel_reason" id="cancel_reason" class="form-control"></textarea>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                            <button type="submit" class="btn btn-primary">Cancel Booking</button>
+                                                        </div>
+                                                    </form>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {% if b.status == 'cancelled' %}
+                                            <!-- Modal: For cancel reason -->
+                                            <div class="modal fade" id="viewModal-{{ b.id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                                    <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="viewModalLabel">Booking Cancelation</h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+
+                                                    <div class="modal-body">
+                                                        <h5 class="modal-title fs-6 text-capitalize mb-1" id="viewModalLabel">{{ b.rooms.category }} - {{ b.user.name }}</h5>
+
+                                                        {% if b.cancelled_by == 'host' %}
+                                                            Cancelled by You
+                                                        {% elif b.cancelled_by == 'user' %}
+                                                            Cancelled by: User (Booker)
+                                                        {% elif b.cancelled_by == 'admin' %}
+                                                            Cancelled by: Admin
+                                                        {% endif %}
+                                                        <br>
+                                                        Reason: {{ b.cancel_reason }} <br>
+                                                        Cancelled At: {{ b.cancelled_at.strftime('%d-%m-%Y %X') }}
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+
+                                        {% endfor %}
+                                    </tbody>
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endif %}
+{% endblock %}

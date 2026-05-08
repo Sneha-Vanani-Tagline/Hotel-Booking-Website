@@ -1,0 +1,95 @@
+{% extends 'auth-base.html'%}
+
+{% block title %} Register {% endblock %}
+
+{% block content %} 
+    <form action="/auth/register" method="post" id="regForm" enctype="multipart/form-data">
+
+        {{ form.hidden_tag() }}
+
+        <div class="input-div form-group mb-3">
+            {{ form.name.label }}
+            {{ form.name(id="namef") }} 
+            <span class="input-error">
+                {% for err in form.name.errors %}
+                    {{ err }}
+                {% endfor %}
+            </span>
+        </div>
+
+        <div class="input-div form-group mb-3">
+            {{ form.email.label }}
+            {{ form.email(id="emailf") }} 
+            <span class="input-error">
+                {% for err in form.email.errors %}
+                    {{ err }}
+                {% endfor %}
+            </span>
+        </div>
+
+        {# <div class="input-div form-group mb-3">
+            {{ form.mno.label }}
+            {{ form.mno(id="mnof") }} 
+            <span class="input-error" id="mnoError">
+                {% for err in form.mno.errors %}
+                    {{ err }}
+                {% endfor %}
+            </span>
+        </div> #}
+
+        <div class="input-div form-group mb-3">
+            {{ form.image.label }}
+            {{ form.image(id="imagef") }} 
+            <span class="input-error">
+                {% for err in form.image.errors %}
+                    {{ err }}
+                {% endfor %}
+            </span>
+        </div>
+
+        <div class="input-div form-group mb-3">
+            {{ form.password.label }}
+            {{ form.password(id="passwordf") }} 
+            <span class="input-error" id="passwordErr">
+                {% for err in form.password.errors %}
+                    {{ err }}
+                {% endfor %}
+            </span>
+        </div>
+
+        <div class="input-div form-group mb-3">
+            {{ form.cfmpsw.label }}
+            {{ form.cfmpsw(id="cfmpswf") }} 
+            <span class="input-error" id="crmpswErr">
+                {% for err in form.cfmpsw.errors %}
+                    {{ err }}
+                {% endfor %}
+            </span>
+        </div>
+
+        <div class="input-div form-group mb-3">
+            {{ form.identity.label }}
+            {% for option in form.identity %} 
+                <label>
+                    {{ option() }} {{ option.label.text }}
+                </label>
+            {% endfor %}
+            <span class="input-error">
+                {% for err in form.identity.errors %}
+                    {{ err }}
+                {% endfor %}
+            </span>
+        </div>
+
+        <div class="submit-btn mb-3">
+            {{ form.submit(id='regSubmit') }}
+        </div>
+    </form>
+
+    <p> Already have an Account?  
+        <a href="{{ url_for('auth.login') }}"> Login</a> |
+        <a href="{{ url_for('admin.login') }}">Admin?</a>
+    </p>
+    
+    <!-- <script src="{{ url_for('static', filename = 'js/script.js') }}"></script> -->
+{% endblock %}

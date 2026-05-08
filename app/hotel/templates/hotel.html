@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block adminName %}
+    - {{ current_user.name }}
+{% endblock %}
+
+{% block content %}
+    <div class="d-flex add-btn-container">
+        <a href="{{ url_for('hotel.addHotel') }}" class="btn btn-primary add-btn">+ Add Hotel</a>
+    </div>
+
+    <div class="d-flex flex-sm-column flex-md-row flex-lg-row .justify-content-start flex-wrap">
+    {% if data %}
+        {% for h in data %}
+            <div class="card mt-2 ms-3 hotel-card-container" style="width: 23rem;">
+                <img src="{{ url_for('static', filename='images/' + h.images)}}" class="card-img-top" alt="Hotel Picture">
+                <div class="card-body"> 
+                    <h5 class="card-title">{{ h.name }}
+                                <small class="text-muted text-capitalize">| {{ h.type }} </small>
+                    </h5>
+                    <p class="card-text text-capitalize">{{ h.description }}</p>
+                    <p class="card-text">Total Rooms: {{ h.total_rooms }}</p>
+                    <p class="card-text">Location: <small class="text-muted text-capitalize">{{ h.location }}</small></p>
+
+                    <div class="action-button">
+                        <!-- <a href="{{ url_for('hotel.view', id=h.id) }}" class="btn btn-success">View</a> -->
+                        <a href="{{ url_for('hotel.editHotel', id=h.id) }}" class="btn btn-warning">Edit</a>
+                        <a href="{{ url_for('hotel.deleteHotel', id=h.id) }}" class="btn btn-danger">Delete</a>
+                    </div> 
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+    </div>
+{% endblock %}      

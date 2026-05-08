@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Booking</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
+
+    <style>
+        body {
+            margin: 0px;
+            padding: 0px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #main-div {
+            border: 1px solid white;
+            border-radius: 8px;
+            box-shadow: 2px 2px 13px 3px rgb(0,0,0,0.1);
+            margin-top: 10%;
+            width: 25vw;
+        }
+
+        .header {
+            text-align: center;
+            margin: 6px 0px;
+        }
+
+        #form-div {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .input-error {
+            color: red;
+        }
+
+        .flash {
+            display: inline-block;
+            width: auto;
+            align-self: right;
+        }
+
+        .flash-err {
+            background-color: lightgoldenrodyellow;
+            border: 0.5px solid red;
+            color: red;
+        }
+        .flash-success {
+            background-color: lightyellow;
+            border: 0.5px solid green;
+            color: green;
+        }
+
+        .submit-btn {
+            margin-top: 5px;
+            display: flex;
+            justify-content: center;
+        }
+
+        #host-user-div {
+            display: flex;
+        }
+
+        #host-user-div.a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+            <ul class="flash">
+                {% for cate,msg in messages %}
+                    <li class="{{ cate }}">{{ msg }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+    {% endwith %}
+
+    <div id="main-div">
+        <h2 class="header">
+            {% block title %} {% endblock %}
+        </h2>
+
+        <div id="form-div">
+            {% block content %} {% endblock %}
+        </div>
+    </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

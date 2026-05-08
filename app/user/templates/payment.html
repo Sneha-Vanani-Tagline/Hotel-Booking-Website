@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if room %}
+        <h2 class="mb-4">Confirm and Pay</h2>
+        <div class="col-8">
+            <div class="row">
+                <div class="col-6 p-2">
+                    <h5>Proceed to Pay</h5>
+                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate, unde.</p>
+                
+                    <form action="{{ url_for('booking.saveBooking') }}" class="pe-4" method="post">
+                        <input type="submit" class="btn btn-dark w-100" value="Pay">
+                    </form>
+                </div>
+
+                <div class="col-6 p-2">
+                    {% if booking %}
+                        <div class="booking-detail-container card-body row flex-lg-row flex-sm-column p-2 bg-white"> 
+                            <div class="card-title">
+                                <h5 class="text-capitalize my-1">{{ room.category }}</h5>
+                                <h6 class="text-capitalize">{{ room.hotel.name }}</h6>
+                                <p class="text-capitalize">{{ room.hotel.location }}</p>
+                            </div>
+                            <hr>
+                            <div class="mb-1">
+                                <p class="card-text">
+                                    CheckIn: {{ booking['checkin'] }} <br>
+                                    CheckOut: {{ booking['checkout'] }}
+                                </p>
+
+                                <hr>
+
+                                <p class="card-text">Guest: {{ booking['guest'] }}</p>
+
+                                <hr>
+
+                                <strong>Price Details</strong> <br>
+                                <div class="card-text d-flex flex-row justify-content-between">
+                                    <p>
+                                        ₹{{ room.price_per_night }} × {{ booking['nights'] }} nights
+                                    </p>
+
+                                    <p>₹{{ booking['totalPrice'] }}</p>
+                                </div>
+                                <hr>
+                                <div class="card-text d-flex flex-row justify-content-between">
+                                    <strong>Total:</strong>
+                                    <p>₹{{ booking['totalPrice'] }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+            
+        
+    {% endif %}
+
+    
+{% endblock %}
+
+

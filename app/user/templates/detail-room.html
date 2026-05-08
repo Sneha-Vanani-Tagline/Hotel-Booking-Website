@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="detail-room-container d-flex justify-content-center">
+        {% if room %}
+            <div class="col-lg-8 col-md-12 col-sm-12">
+
+                {% if images %}
+                    <div class="row mb-1">
+                        <div class="image-grid g-1">
+                            <img src="{{ url_for('static', filename='images/rooms/' + images[0]) }}" class="main-img">
+
+                            <div class="side-imgs">
+                                {% for img in images[1:] %}
+                                    <img src="{{ url_for('static', filename='images/rooms/' + img) }}">
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- room detail -->
+                <div class="room-details row">
+                    <div class="col-8 p-3">
+                        <div class="text-capitalize mb-4">
+                            <h4 class="mb-1">{{ room.category }}</h4>
+                            <p style="font-weight: 600;">{{ room.hotel.description }}</p>
+                        </div>
+
+                        <h5 class="text-capitalize mb-3"> 
+                            <strong>By {{ room.hotel.name }} </strong> <br>
+                            <small style="font-weight: 400;">{{ room.hotel.location }}</small>
+                        </h5>
+
+                        <h5>Amenities</h5>
+                        <div class="facility-container mb-3">
+                            {% if facilities %}
+                                <ul class=" d-flex gap-5 flex-wrap">
+                                    {% for f in facilities %}
+                                        <li>{{ f }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+
+                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam neque vitae odit incidunt tenetur corrupti possimus recusandae dolores molestiae officiis! Aliquam, omnis ipsa at commodi error adipisci cupiditate ratione, qui porro quod veniam neque est maiores recusandae autem, assumenda quos alias ipsam repellendus reprehenderit fugiat et! Soluta fugit dicta totam.</p>
+                    </div>
+
+                    <div class="col-4 pt-5">
+                        <!-- price card -->
+                        <div class="price-container card-body row flex-lg-row flex-sm-column p-2 bg-white"> 
+                            <h5 class="card-title text-capitalize my-1">Price: ₹{{ room.price_per_night }}/night</h5>
+                            
+                            <form action="{{ url_for('user.room', rid=room.id) }}" method="post" id="booking_form">
+                                <div class="mb-3">
+                                    <input type="text" name="rid" value="{{ room.id }}" hidden>
+                                    <h6 class="card-text text-capitalize">{{ room.category }} | {{ room.bedrooms }} room | {{ room.beds }} bed</h6> 
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="checkin">Check-in</label>
+                                    <input type="date" class="form-control" name="checkin" id="checkin_field" min="{{ current_date }}" required>  <!-- Gives result as a string -->
+
+                                    <label for="checkout">Check-out</label>
+                                    <input type="date" class="form-control" name="checkout" id="checkout_field" min="{{ current_date }}" required> <!-- Gives result as a string -->
+                                </div>
+                            
+                                <div class="mb-3">
+                                    <label for="person">Guest</label>
+                                    <input type="text" class="form-control" name="person" value="{{ room.person_capacity }}" readonly>
+                                </div>
+                                
+                                <div class=" mb-3">
+                                    <p id="price" data-price="{{ room.price_per_night }}">₹{{ room.price_per_night }} × <span id="nights">0</span> nights</p>
+                                </div>
+
+                                <div class="price-box mb-3 p-2">
+                                    <h6 class="mb-0">Total: ₹
+                                        <input type="text" name="totalPrice" id="totalPrice" value="0" class="form-control" readonly>
+                                    </h6>
+                                </div>
+
+                                <div class="m-3">
+                                    {% if current_user %}
+                                            <button type="submit" class="btn w-100" style="background-color: rgb(239, 51, 83);color: white;">Book Now</button>
+                                        
+                                    {% else %}    
+                                        <a href="{{ url_for('auth.login') }}" class="btn btn-dark w-100">Login to Book</a>
+                                    {% endif %}
+                                    
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+
+{% block js %} 
+    <script src="{{ url_for('user.static', filename='detail-room.js') }}"></script>
+{% endblock %}

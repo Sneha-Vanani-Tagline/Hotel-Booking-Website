@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block adminName %} 
+   - Super Admin
+{% endblock %}
+
+{% block content %}
+    <div class="mb-4">
+    <!-- Bookers -->
+    {% if users %}
+        <h2>Users (Bookers)</h2>
+        <div class="card shadow-sm p-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Mail Verified</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for u in users %}
+                                <tr>
+                                    <td>#{{ u.id }}</td>
+                                    <td>{{ u.name }}</td>
+                                    <td>{{ u.email }}</td>
+                                    <td>{{ u.role }}</td>
+                                    <td>{{ u.is_verified }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    </div>
+
+    <!-- hotel owners -->
+    {% if hosts %}
+        <h2>Hotel Owners</h2>
+        <div class="card shadow-sm p-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Mail Verified</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for u in hosts %}
+                                <tr>
+                                    <td>#{{ u.id }}</td>
+                                    <td>{{ u.name }}</td>
+                                    <td>{{ u.email }}</td>
+                                    <td>{{ u.role }}</td>
+                                    <td>{{ u.is_verified }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+

@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block adminName %}
+    - {{ current_user.name }} 
+{% endblock %}
+
+{% block content %}
+    <div class="col-7 d-flex justify-content-center">
+        
+        <div style="width: 400px; max-width: 570px;">
+            <form action="{{ form_action }}" enctype="multipart/form-data" method="post">
+                <h2 id="title">{{ action }} Room</h2>
+                <!-- <h5 class="text-center">Add Room</h5> -->
+
+                {{ form.hidden_tag() }}
+
+                <div class="row mb-3">
+                    <div class="form-group">
+                        {{ form.category.label }}
+                        {{ form.category(class_="form-control") }}
+                        <span class="input-err">
+                            {% for err in form.category.errors %}
+                                {{ err }}
+                            {% endfor %}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- remaining -->
+                <div class="row mb-3">
+                    <div class="form-group col-6">
+                        {{ form.bedrooms.label }}
+                        {{ form.bedrooms(class_="form-control") }}
+                        <span class="input-err">
+                            {% for err in form.bedrooms.errors %}
+                                {{ err }}
+                            {% endfor %}
+                        </span>
+                    </div>
+
+                    <div class="form-group col-6">
+                        {{ form.beds.label }}
+                        {{ form.beds(class_="form-control") }}
+                        <span class="input-err">
+                            {% for err in form.beds.errors %}
+                                {{ err }}
+                            {% endfor %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="form-group col-6">
+                        {{ form.person_capacity.label }}
+                        {{ form.person_capacity(class_="form-control") }}
+                        <span class="input-err">
+                            {% for err in form.person_capacity.errors %}
+                                {{ err }}
+                            {% endfor %}
+                        </span>
+                    </div>
+
+                    <div class="form-group col-6">
+                        {{ form.price_per_night.label }}
+                        {{ form.price_per_night(class_="form-control") }}
+                        <span class="input-err">
+                            {% for err in form.price_per_night.errors %}
+                                {{ err }}
+                            {% endfor %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="form-group col-6">
+                        {{ form.no_rooms.label }}
+                        {{ form.no_rooms(class_="form-control") }}
+                        <span class="input-err">
+                            {% for err in form.no_rooms.errors %}
+                                {{ err }}
+                            {% endfor %}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Existing images -->
+                <div class="row mb-3 d-flex flex-row">
+                    <label class="form-label">Saved Images</label>
+                    {% if action == 'Edit' %}
+                        {% for i in roomImages %}
+                        <div class="mb-1">
+                            <img src="{{ url_for('static', filename='images/rooms/' + i.image) }}" width="100">
+
+                            <input type="checkbox" name="delete_images" value="{{ i.id }}">
+                            Delete
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Upload new images -->
+                <div class="row mb-3">
+                    <div class="form-group">
+                        {{ form.image.label }}
+                        {{ form.image(class_="form-control") }}
+                        <span class="input-err">
+                            {% for err in form.image.errors %}
+                                {{ err }}
+                            {% endfor %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    {% if action == 'Add' %}
+                        <label class="form-label">Facilities</label>
+                        {% if facility %}
+                            {% for f in facility %}
+                                <div class="input-group">
+                                    <div class="input-group-text">  
+                                        <input class="form-check-input mt-0" type="checkbox" value="{{ f.id }}" name="facility">
+                                    </div>
+                                    <label for="facility" class="form-control">{{ f.name }}</label>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% else %}
+
+                        <label class="form-label">Facilities</label>
+                        {% if facility %}
+                            {% for f in facility %}
+                                <div class="input-group">
+                                    <div class="input-group-text">
+                                        <input class="form-check-input mt-0" type="checkbox" value="{{ f.id }}" name="facility"
+                                            {% if f.id in currentFacility %} checked {% endif %}>
+                                    </div>
+                                    <label for="facility" class="form-control">{{ f.name }}</label>           
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <div class="text-center">
+                    <input type="submit" class="btn btn-primary" value="{{ submit }}">
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+{% endblock %}

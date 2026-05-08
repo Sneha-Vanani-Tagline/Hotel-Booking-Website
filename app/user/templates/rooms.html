@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    
+    <h2 class="mb-3 text-capitalize">
+        {% if city %}
+            Rooms in {{ city }}
+        {% else %}
+            Rooms
+        {% endif %}
+    </h2>
+
+    <div>
+        {% if rooms %}
+            <div class="room-container">
+                <!-- filter button -->
+                <div class="d-flex justify-content-start mb-1" >
+                    <button class="btn btn-outline-dark px-2.5 py-2" id="filterToggle" style="max-height: 50px;">
+                        ⚙️ Filters
+                    </button>
+                </div>
+                    
+                {% for room in rooms %}
+                    <div class="room_container row mb-3" style="width: 100%; max-height: 220px;">
+                        <div class="room-card-container card mb-3 bg-white" style="max-height: 220px;">
+                            <div class="row g-0">
+
+                                <!-- LEFT: Images -->
+                                <div class="col-lg-4">
+                                    {% set room_images = images[room.id] %}
+                                    
+                                    {% if room_images %}
+                                    <div class="image-grid">
+                                        <img src="{{ url_for('static', filename='images/rooms/' + room_images[0]) }}" class="main-img">
+
+                                        <div class="side-imgs">
+                                            {% for img in room_images[1:] %}
+                                                <img src="{{ url_for('static', filename='images/rooms/' + img) }}">
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- RIGHT: Details -->
+                                <div class="col-lg-8 p-2">
+                                    <div class="card-body row flex-lg-row flex-sm-column p-0"> 
+                                    <!-- card body -->
+                                        <div class="col-9">
+                                            <div class="row pt-2 ps-3">
+                                                <h5 class="card-title text-capitalize">{{ room.category }}</h5>
+
+                                                <div class="col-6">
+                                                    <p class="card-text text-capitalize"> 
+                                                        <strong>By {{ room.hotel.name }} </strong> <br>
+                                                        {{ room.hotel.location }}
+                                                    </p>
+                                                    <p class="card-text">
+                                                        <span class="rooms" data-rooms="{{ room.bedrooms }}">Bedrooms {{ room.bedrooms }}</span> <br>
+                                                        <span>Beds: {{ room.beds }}</span> <br>
+                                                        <span class="guest" data-guest="{{ room.person_capacity }}">Guest: {{ room.person_capacity }}</span> <br>
+                                                        <span class="price" data-price="{{ room.price_per_night }}">Price: {{ room.price_per_night }}/night</span> <br>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-3 pt-3">
+                                            <!-- action button (edit / delete) -->
+                                            <div class="action-button text-center d-flex flex-column justify-content-end">
+                                                <a href="{{ url_for('user.room', rid=room.id) }}" class="btn btn-outline-secondary mb-2" style="max-width: 150px;">View Details</a>
+                                                {% if current_user %}
+                                                    <a href="#" class="btn btn-success mb-2" style="max-width: 150px;">Book Now</a>
+                                                {% else %}
+                                                    <a href="{{ url_for('auth.login') }}">Login</a>
+                                                {% endif %}
+                                            </div> 
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+
+{% block js %} 
+    <script src="{{ url_for('user.static', filename='rooms.js') }}"></script>
+{% endblock %}

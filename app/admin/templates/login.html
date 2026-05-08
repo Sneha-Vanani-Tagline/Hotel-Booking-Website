@@ -1,0 +1,30 @@
+{% extends auth-base.html %}
+
+{% block title %} Admin Login {% endblock %}
+
+{% block content %} 
+    <form action="/admin/login" method="post" id="form">
+        {{ form.hidden_tag() }}
+
+        <div class="input-div">
+            {{ form.email.label }}
+            {{ form.email }}
+            {% for err in form.email.errors %}
+                <span class="error">{{ err }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="input-div">
+            {{ form.password.label }}
+            {{ form.password }}
+            {% for err in form.password.errors %}
+                <span class="error">{{ err }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="submit-btn">
+            {{ form.submit() }}
+        </div>
+    </form>
+
+{% endblock %}

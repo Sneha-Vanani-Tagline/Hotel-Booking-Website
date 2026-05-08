@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="form-container row">
+        
+            <form action="{{ form_action }}" enctype="multipart/form-data" method="post" class="col-6">
+                <h2 class="text-center">Edit Details</h2>
+
+                {{ form.hidden_tag() }}
+
+                <div class="form-group mb-3">
+                    {{ form.name.label }}
+                    {{ form.name(class_="form-control") }}
+                    <span class="input-error">
+                        {% for err in form.name.errors %}
+                            {{ err }}
+                        {% endfor %}
+                    </span>
+                </div>
+
+                <div class="form-group mb-3">
+                    {{ form.email.label }}
+                    {{ form.email(class_="form-control") }}
+                    <span class="input-error">
+                        {% for err in form.email.errors %}
+                            {{ err }}
+                        {% endfor %}
+                    </span>
+                </div> 
+                
+                <!-- <div class="form-group">
+                    {{ form.image.label }}
+                    {{ form.image(class_="form-control") }}
+                    <span class="input-error">
+                        {% for err in form.image.errors %}
+                            {{ err }}
+                        {% endfor %}
+                    </span>
+                </div> -->
+
+                
+                    {% if form.image.data %}
+                    <div class="form-group mb-3">
+                        {{ form.image.label }}
+                        {{ form.image(class_="form-control img-field") }}
+                    </div>
+
+                    <div class="card mb-3" style="width:10rem ;">
+                        <img src="{{ url_for('static', filename='images/' + form.image.data) }}" class="card-img-top img" alt="Profile Image">
+                    </div>
+                    {% endif %}
+                
+                <div class="text-center">
+                    {{ form.submit(class_="btn btn-primary mb-3") }}
+                </div>
+            </form>
+       
+    </div>
+{% endblock %}

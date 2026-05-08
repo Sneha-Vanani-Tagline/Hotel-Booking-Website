@@ -1,0 +1,25 @@
+{% extends 'auth-base.html'%}
+
+{% block title %} Verify OTP {% endblock %}
+
+{% block content %} 
+    <form action="{{ url_for('auth.verify') }}" method="post" id="form">
+        {{ form.hidden_tag() }}
+
+        <div class="input-div form-group">
+            {{ form.otp.label }}
+            {{ form.otp(class_="form-control") }}
+            {% for err in form.otp.errors %}
+                <span class="error">{{ err }}</span>
+            {% endfor %}
+        </div>
+
+        <div class="submit-btn">
+            {{ form.submit(class_="btn btn-primary") }}
+        </div>
+    </form>
+
+    <p> Didn't register? 
+        <a href="{{ url_for('auth.register') }}">Register</a>
+    </p>
+{% endblock %}

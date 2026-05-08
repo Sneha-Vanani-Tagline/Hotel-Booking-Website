@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if user %}
+        <h4 class="mb-3">My Bookings</h4>
+
+        <div class="booking-filter-container d-flex gap-2 flex-wrap mb-3">
+
+            <button class="filter-btn active" id="allFilter">
+                All
+            </button>
+
+            <button class="filter-btn" id="upcomingFilter">
+                Upcoming
+            </button>
+
+            <button class="filter-btn" id="completedFilter">
+                Completed
+            </button>
+
+            <button class="filter-btn" id="cancelledFilter">
+                Cancelled
+            </button>
+
+        </div>
+
+        {% if bookings %}
+            <div class="d-flex flex-sm-column flex-md-row flex-lg-row justify-content-start flex-wrap">
+
+                {% for b in bookings %}
+                    {% if b.rooms %}
+
+                        {% set room = b.rooms %}
+
+                        <div class="card mt-2 ms-3 booking-card-conatiner hidden" style="width: 23rem;" data-status="{{ b.status }}">
+
+                            {% for img in room.images[:1] %}
+                                <img src="{{ url_for('static', filename='images/rooms/' + img.image)}}" class="card-img-top" alt="room image">
+                            {% endfor %}
+
+                            <div class="card-body"> 
+                                <h5 class="card-title text-capitalize">{{ room.category }}
+                                            <small class="text-muted text-capitalize">| {{ room.hotel.name }} </small>
+                                </h5>
+
+                                <p class="card-text text-capitalize">{{ room.hotel.location }}</p>
+
+                                <p class="card-text text-capitalize">Trip Dates: <br>
+                                    <small>CheckIn: {{ b.date_of_arrival }} </small> <br>
+                                    <small class="checkout" data-checkout="{{ b.date_of_departure }}">checkOut: {{ b.date_of_departure }} </small>  
+                                     <br>
+                                    <small class="text-muted">nights: {{ b.nights }}</small>
+                                </p>
+
+                                <p class="card-text">Room Detail: <br>
+                                    <small class="text-muted text-capitalize">bedrooms: {{ b.bedrooms }} <br>
+                                        guest: {{ b.guest }}
+                                    </small>
+                                </p>
+
+                                <p class="card-text">Price: {{ b.total_price }}</p>
+
+                                <div class="d-flex align-items-stretch gap-2 flex-row">
+                                    {% if b.status == 'confirmed' %}
+                                        <span class="booking-status badge bg-success d-flex align-items-center justify-content-center px-3 w-100">Confirmed</span>
+                                        <a href="#" class="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">Cancel</a>
+
+                                        <!-- Modal: on cancel click -->
+                                        <div class="modal fade" id="cancelModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                                <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="cancelModalLabel">Booking Cancelation</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <!-- form: cancel reason -->
+                                                <form action="{{ url_for('booking.myBookings', uid=current_user.id) }}" method="post">
+                                                    <div class="modal-body">
+                                                        <h5 class="modal-title fs-6 text-capitalize mb-1" id="cancelModalLabel">{{ room.category }} - {{ room.hotel.name }}</h5>
+
+                                                        <input type="hidden" value="{{ b.id }}" name="bookingid">
+                                                        <label for="cancel_reason" class="form-label">Reason</label>
+                                                        <textarea name="cancel_reason" id="cancel_reason" class="form-control"></textarea>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="submit" class="btn btn-primary">Cancel Booking</button>
+                                                    </div>
+                                                </form>
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    {% elif b.status == 'cancelled' %}
+                                    <div class="d-flex flex-column">
+                                        <span class="booking-status badge bg-danger d-flex align-items-center justify-content-center px-3 w-100" style="height: 30px;">Cancelled</span>
+                                    
+                                        <p class="text-danger w-100">
+                                            {% if b.cancelled_by == 'host' %}
+                                                Cancelled by: Hotel Owner 
+                                            {% elif b.cancelled_by == 'user' %}
+                                                Cancelled by You 
+                                            {% elif b.cancelled_by == 'admin' %}
+                                                Cancelled by: Admin
+                                            {% endif %}
+                                            <br>
+                                            Reason: {{ b.cancel_reason }} <br>
+                                            Cancelled At: {{ b.cancelled_at.strftime('%d-%m-%Y %X') }}
+                                        </p>
+                                    </div>    
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block js %} 
+            <script src="{{ url_for('booking.static', filename='script.js') }}"></script>
+{% endblock %}
+

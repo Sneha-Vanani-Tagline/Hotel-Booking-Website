@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block adminName %} 
+    - {{ current_user.name }}
+{% endblock %}
+
+{% block content %}
+
+    <div id="hotel-form-container">
+        {# <!-- <form id="hotelForm" action="{{ url_for('hotel.editHotel', id=hotel.id) }}" method="POST"> --> #}
+        
+        <form id="hotelForm" action="{{ form_action }}" method="POST" enctype="multipart/form-data">
+            <h2 id="title">{{ action }} Hotel</h2>
+
+            {{ form.hidden_tag() }}
+            <div class="row mb-3">
+                <div class="input-div form-group">
+                    {{ form.name.label }}
+                    {{ form.name(class_="form-control") }}
+                    {% for err in form.name.errors %}
+                        <span class="input-err">{{ err }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="input-div form-group col-7">
+                    {{ form.type.label }}
+                    {{ form.type(class_="form-control") }}
+                    {% for err in form.type.errors %}
+                        <span class="input-err">{{ err }}</span>
+                    {% endfor %}
+                </div>
+
+                <div class="input-div form-group col-5">
+                    {{ form.total_rooms.label }}
+                    {{ form.total_rooms(class_="form-control") }}
+                    {% for err in form.total_rooms.errors %}
+                        <span class="input-err">{{ err }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="input-div form-group col-md-12">
+                    {{ form.description.label }}
+                    {{ form.description(class_="form-control") }}
+                    {% for err in form.description.errors %}
+                        <span class="input-err">{{ err }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="input-div form-group col-md-7">
+                    {{ form.images.label }}
+                    {{ form.images }}
+                    {% for err in form.images.errors %}
+                        <span class="input-err">{{ err }}</span>
+                    {% endfor %}
+                </div>
+                <div class="input-div form-group col-md-5">
+                    {{ form.city.label }}
+                    {{ form.city(class_="form-control") }}
+                    {% for err in form.city.errors %}
+                        <span class="input-err">{{ err }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+                
+            <div class="row mb-3">
+                <div class="input-div form-group col-md-12">
+                    {{ form.location.label }}
+                    {{ form.location(class_="form-control") }}
+                    {% for err in form.location.errors %}
+                        <span class="input-err">{{ err }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="submit-btn">
+                <input type="submit" value="{{ submit }}" class="btn btn-primary">
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+
+
+
