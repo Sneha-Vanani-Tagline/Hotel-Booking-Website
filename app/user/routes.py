@@ -10,6 +10,7 @@ from app.models import User_cred, Rooms, Room_facilities, Room_Image, Hotels
 
 UPLOAD_FOLDER = 'app/static/images/'
 
+@user.route('/')
 @user.route('/home')
 def home():
     rooms = Hotel_S.getAllRooms()
@@ -54,7 +55,7 @@ def rooms(city):
 @user.route('/search_rooms', methods = ['GET'])
 def search_rooms():
     
-    city = request.args.get('city')
+    city = request.args.get('city').lower()
     guest = request.args.get('guest')
     checkin = request.args.get('checkin')   # returns string
     checkout = request.args.get('checkout') # returns string
@@ -82,7 +83,7 @@ def search_rooms():
         checkout_date = datetime.strptime(checkout, '%Y-%m-%d').date() 
 
         for room in rooms:
-            if Hotel_S.checkAvailability(room.id, room.category, checkin_date, checkout_date):
+            if Hotel_S.checkAvailability(room.id, checkin_date, checkout_date):
 
                 room_list.append(room)
                 # fetch rooms images
@@ -95,9 +96,6 @@ def search_rooms():
             # fetch rooms images
             roomwise_img[room.id] = Hotel_S.getRoomImageName_list(room.images)
             roomWise_facility[room.id] = Hotel_S.getRoomFacility_nameList(room.facilities)
-
-  
-    # current_date=date.isoformat() #gives date in yyyy-mm-dd formate in string
         
     return render_template('rooms.html', rooms = room_list, images = roomwise_img, facilities = roomWise_facility)
 
@@ -122,7 +120,7 @@ def room(rid):
         checkout = datetime.strptime(
             request.form.get('checkout'), '%Y-%m-%d').date()
 
-        if not(Hotel_S.checkAvailability(rid = rid, rcategory=roomData.category, checkin=checkin, checkout=checkout)):
+        if not(Hotel_S.checkAvailability(rid = rid, checkin=checkin, checkout=checkout)):
             flash('Room is not Available in these dates!', 'flash-err')
             return render_template('detail-room.html', room = roomData, images = images, facilities = facilities)
         else:

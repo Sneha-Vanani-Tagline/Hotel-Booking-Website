@@ -9,7 +9,7 @@
     
         <div class="stats d-flex gap-4 text-center align-items-stretch">
 
-            <a href="{{ url_for('hotel.list') }}">
+            <a href="{{ url_for('admin.userlist') }}">
                 <div class="card p-3" style="width: 12rem;">Total Users
                     <span class="fs-3">
                         {% if users %}
@@ -21,7 +21,7 @@
                 </div> 
             </a>
         
-            <a href="{{ url_for('hotel.list') }}">
+            <a href="{{ url_for('admin.hotellist') }}">
                 <div class="card p-3" style="width: 12rem;">Total Hotels
                     <span class="fs-3">
                         {% if hotels %}
@@ -33,7 +33,7 @@
                 </div> 
             </a>
 
-            <a href="{{ url_for('booking.allBookings') }}">
+            <a href="{{ url_for('admin.bookinglist') }}">
                 <div class="card p-3" style="width: 12rem;">Total Active Bookings
                     <span class="fs-3">
                         {% if bookings %}
@@ -45,7 +45,19 @@
                 </div> 
             </a>
 
-            <a href="{{ url_for('room.roomlist') }}">
+            <a href="{{ url_for('admin.bookinglist') }}">
+                <div class="card p-3" style="width: 12rem;">Total Completed Bookings
+                    <span class="fs-3">
+                        {% if completedBooking %}
+                            {{ completedBooking }}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </span>
+                </div> 
+            </a>
+
+            <a href="{{ url_for('admin.bookinglist') }}">
                 <div class="card p-3" style="width: 12rem;">Total Cancelled Bookings
                     <span class="fs-3">
                         {% if cancelBookings %}

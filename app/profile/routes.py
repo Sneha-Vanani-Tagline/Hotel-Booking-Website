@@ -25,7 +25,7 @@ def edit(id):
         return render_template('edit-user.html', form = form, data=user)
     
     if form.validate_on_submit():
-        name = form.name.data
+        name = form.name.data.lower()
         image = form.image.data
 
         # print(user.id)

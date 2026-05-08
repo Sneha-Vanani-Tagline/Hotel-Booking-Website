@@ -13,27 +13,15 @@ from app.auth.decorator import auth_required, login_required
 
 UPLOAD_FOLDER = 'app/static/images/rooms/'
 
-def authenticate():
-    if session.get('email', None) != None:
-        return True
-    else:
-        return False
-
 @room.route('/roomlist')
 @auth_required('host')
 def roomlist():
-    if authenticate():
-        hotelData = HotelS.getHotelsData()
-        rooms = HotelS.getAllRooms()
-        facility = HotelS.getAllFacility()
-        rImages = HotelS.getAllRoomImages()
-        rFacility = HotelS.getAllRoomFacility()
+    host = UserS.getUserById(session['user_id'])
+    hotelData = host.hotels
 
-        return render_template('room-list.html', hotel = hotelData, room = rooms, facility = facility, images = rImages, rfacility = rFacility)
+    return render_template('room-list.html', hotel = hotelData)
 
-    else:
-        flash('Access Denied', 'flash-err')
-        return redirect(url_for('auth.login'))
+    
     
 @room.route('/add/<int:hid>', methods = ['GET', 'POST'])
 @auth_required('host')
@@ -43,7 +31,7 @@ def add(hid):
     facility = HotelS.getAllFacility()
 
     if form.validate_on_submit():
-        category = form.category.data
+        category = form.category.data.lower()
         bedrooms = form.bedrooms.data
         beds = form.beds.data
         person = form.person_capacity.data
@@ -72,46 +60,50 @@ def edit(rid):
     roomData = HotelS.getRoomById(rid)
     form = RoomForm(obj = roomData)
     facility = HotelS.getAllFacility()
-    currentFacility = HotelS.getRoomFacilityByRoomId(rid)
-    roomImages = HotelS.getRoomImageById(rid)
+    currentFacility = roomData.facilities
+    roomImages = roomData.images
 
     cFacilityId = []
     for f in currentFacility:
         cFacilityId.append(f.facility_id)
+
+    print(cFacilityId)
 
     cImagesName = []
     for i in roomImages:
         cImagesName.append(i.image)
 
     if form.validate_on_submit():
-        category = form.category.data
-        bedrooms = form.bedrooms.data
-        beds = form.beds.data
-        person = form.person_capacity.data
-        price = form.price_per_night.data
-        rooms = form.no_rooms.data
+        category = form.category.data.lower()
+        bedrooms = int(form.bedrooms.data)
+        beds = int(form.beds.data)
+        person = int(form.person_capacity.data)
+        price = int(form.price_per_night.data)
+        rooms = int(form.no_rooms.data)
         images = []
 
         
         for i in form.image.data:
             if i and i.filename != '':
                 f = secure_filename(i.filename)
-                
-                # file = UPLOAD_FOLDER + f
-                # print(os.path.isfile(file))       # to check is it file or not
                 i.save(os.path.join(UPLOAD_FOLDER, f))
                 images.append(f)
 
-        # print('images in route : ',images)
         deleteImages = request.form.getlist('delete_images')
-            
         facility = request.form.getlist('facility')
    
         updatedData = checkUpdate(roomData, cFacilityId, cImagesName, category=category, bedrooms=bedrooms, beds=beds, person_capacity=person, price_per_night=price, no_rooms=rooms, images=images, facility = facility)
-        HotelS.editRoom(rid,deleteImages, updatedData)
+        if updatedData != False or deleteImages:
+            print('going to services')
+            HotelS.editRoom(rid,deleteImages, updatedData)
 
-        flash('Room Updated', 'flash-succcess')
-        return redirect(url_for('room.roomlist'))
+            flash('Room Updated', 'flash-succcess')
+            return redirect(url_for('room.roomlist'))
+        else:
+            flash('Please change the details first!', 'flash-err')
+            return render_template('room-form.html',form=form, roomImages=roomImages, facility = facility, currentFacility=cFacilityId, action='Edit', submit='Update')
+
+        
 
     elif request.method == 'GET':
         return render_template('room-form.html',form=form, roomImages=roomImages, facility = facility, currentFacility=cFacilityId, action='Edit', submit='Update')
@@ -129,7 +121,7 @@ def checkUpdate(existingRoomData, existingFacilityId, existingImagesName, **newD
     updateFlag = False
 
     # Rooms table fields
-    if existingRoomData.category != newData['category']:
+    if (existingRoomData.category) != newData['category']:
         updatedFields['category'] = newData['category']
         updateFlag = True
 
@@ -153,19 +145,22 @@ def checkUpdate(existingRoomData, existingFacilityId, existingImagesName, **newD
         updatedFields['no_rooms'] = newData['no_rooms']
         updateFlag = True
 
-    # Room Images table 
+    # Room Images
     if existingImagesName != newData['images']:
         updatedFields['images'] = newData['images']
         updateFlag = True
 
-    # Room facilities table 
+    # Room facilities
     if existingFacilityId != newData['facility']:
         # getlist() gives as a string, so we have to convert it into a integer
         updatedFields['facility'] = list(map(int, newData['facility']))
         updateFlag = True
 
     if updateFlag == False:
+        print('not changed')
         flash('Please change the details first!', 'flash-err')
+        return False
     else:
+        print('changed')
         return updatedFields
 

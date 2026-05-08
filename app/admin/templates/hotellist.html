@@ -16,7 +16,8 @@
                         <thead class="table-dark">
                             <tr>
                                 <th>#</th>
-                                <th>Name</th>
+                                <th>Owner Name</th>
+                                <th>Hotel Name</th>
                                 <th>Hotel Type</th>
                                 <th>Address</th>
                                 <th>City</th>
@@ -27,6 +28,7 @@
                             {% for h in Hotels %}
                                 <tr class="text-capitalize">
                                     <td>#{{ h.id }}</td>
+                                    <td>{{ h.host.name }}</td>
                                     <td>{{ h.name }}</td>
                                     <td>{{ h.type }}</td>
                                     <td>{{ h.location }}</td>

@@ -42,12 +42,10 @@ def getUserBooking(id):
 
 def resetPass(uid, new):
     user = User_cred.query.get(uid)
-    # print(user, uid, type(uid))
+
     if user:
-        # print('user found in password reset')
         user.password = new
         db.session.commit()
         return True
     else:
-        # print('user not found in password reset')
         return False

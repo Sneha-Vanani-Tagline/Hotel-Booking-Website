@@ -37,8 +37,32 @@
                 <a href="{{ url_for('booking.allBookings') }}">
                     <div class="card p-3" style="width: 12rem;">Total Active Bookings
                         <span class="fs-3">
-                            {% if bookings %}
-                                {{ bookings }}
+                            {% if active_bookings %}
+                                {{ active_bookings }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </span>
+                    </div> 
+                </a>
+
+                <a href="{{ url_for('booking.allBookings') }}">
+                    <div class="card p-3" style="width: 12rem;">Total Completed Bookings
+                        <span class="fs-3">
+                            {% if completed_bookings %}
+                                {{ completed_bookings }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </span>
+                    </div> 
+                </a>
+
+                <a href="{{ url_for('booking.allBookings') }}">
+                    <div class="card p-3" style="width: 12rem;">Total Cancelled Bookings
+                        <span class="fs-3">
+                            {% if cancelled_bookings %}
+                                {{ cancelled_bookings }}
                             {% else %}
                                 0
                             {% endif %}

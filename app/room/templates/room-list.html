@@ -8,16 +8,15 @@
 {% block content %}
     {% if hotel %}
         {% for h in hotel %}
-            <div class="mb-4">
+            <div class="mb-4 text-capitalize">
                 <div class="d-flex justify-content-between mb-2"> 
                     <h4>{{ h.name }}</h4>
                     <a href="{{ url_for('room.add', hid=h.id) }}" class="btn btn-primary">+ Add New Room</a>
                 </div>
 
-                {% if room %}
+                {% if h.rooms %}
                 <div class="room-container">
-                    {% for r in room %}
-                        {% if r.hotel_id == h.id %}
+                    {% for r in h.rooms %}
 
                         <div class="row mb-2" style="width: 100%;"></div>
                             <div class="card room-card-container d-flex flex-sm-column flex-lg-row">
@@ -30,12 +29,10 @@
                                             <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
                                         </div>
                                         <div class="carousel-inner">
-                                            {% for i in images %}
-                                                {% if i.room_id == r.id %}
-                                                    <div class="carousel-item active">
-                                                        <img src="{{ url_for('static', filename='images/rooms/' + i.image) }}" class="d-block w-100" alt="room image">
-                                                    </div>
-                                                {% endif %}
+                                            {% for i in r.images %}
+                                                <div class="carousel-item active">
+                                                    <img src="{{ url_for('static', filename='images/rooms/' + i.image) }}" class="d-block w-100" alt="room image">
+                                                </div>
                                             {% endfor %}
                                         </div>
                                         <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
@@ -62,23 +59,16 @@
                                                     Guest: {{ r.person_capacity }} <br>
                                                     Price per Night: {{ r.price_per_night }} <br>
                                                     Total Rooms: {{ r.no_rooms }} <br>
-                                                    Available Rooms: {{ r.available_rooms }}
                                                 </p>
                                             </div>
 
                                             <!-- room facility -->
                                             <div class="col-6">
-                                                {% if rfacility %}
+                                                {% if r.facilities %}
                                                     <p class="card-text">Facilities:
                                                         <ul>
-                                                            {% for rf in rfacility %}
-                                                                {% if rf.room_id == r.id %}
-                                                                    {% for f in facility %}
-                                                                        {% if f.id == rf.facility_id %}
-                                                                            <li>{{ f.name }}</li>
-                                                                        {% endif %}
-                                                                    {% endfor %}
-                                                                {% endif %}
+                                                            {% for f in r.facilities %}
+                                                                <li>{{ f.facility.name }}</li>
                                                             {% endfor %}
                                                         </ul>
                                                     </p>
@@ -97,7 +87,7 @@
                                 </div>
                                 </div>
                             </div>
-                        {% endif %}
+                        
                     {% endfor %}
                 </div>
                 {% endif %}

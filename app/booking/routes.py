@@ -1,13 +1,11 @@
 from . import booking
 from flask import request, redirect, url_for, render_template, flash, session
-import os
 from datetime import date, datetime, timezone
-from werkzeug.utils import secure_filename
 import app.services.hotel_service as Hotel_S
 import app.services.user_service as User_S
 from app.auth.decorator import auth_required, login_required
 
-
+# save bookings
 @booking.route('/saveBooking', methods = ['POST'])
 @auth_required('user')
 def saveBooking():
@@ -38,6 +36,7 @@ def saveBooking():
             flash('Conflictaed with available rooms', 'flash-err') 
             return redirect(url_for('user.payment'))
 
+# user panel: mybookings
 @booking.route('/myBookings/<int:uid>', methods = ['GET', 'POST'])
 @auth_required('user')
 def myBookings(uid):
@@ -59,7 +58,7 @@ def myBookings(uid):
         diff = (current_booking.date_of_arrival - datetime.now(timezone.utc).date()).days
         
         if diff >= 2:
-            Hotel_S.cancelBooking(bid=bid,reason=reason,cancelledBy=cancelled_by)
+            Hotel_S.cancelBooking(bid=bid, reason=reason, cancelledBy=cancelled_by)
             flash('Booking cancelled!', 'flash-success')
         else:
             flash('Cancellation is no longer allowed. Bookings can only be cancelled at least 2 days before the check-in date!', 'flash-err')
@@ -73,15 +72,12 @@ def allBookings():
     hostUser = User_S.getUserById(session['user_id'])
     hotel = hostUser.hotels
     
-    
     if request.method == 'POST':
         bid = request.form.get('bookingid')
         current_booking = Hotel_S.getBooking_ById(bid)
         reason = request.form.get('cancel_reason')
         cancelled_by = 'host'
-        # print(type(datetime.utcnow), lambda: datetime.now(timezone.utc))
-        # print(type(datetime.now(timezone.utc)), datetime.now(timezone.utc))
-
+    
         diff = (current_booking.date_of_arrival - datetime.now(timezone.utc).date()).days
         
         if diff >= 2:

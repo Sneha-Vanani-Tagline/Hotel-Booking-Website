@@ -230,7 +230,7 @@ def getRoomImageName_list(images_obj):
 
 # ----------------------- Bookings -----------------------
 def addBooking(data):
-    if checkAvailability():
+    if checkAvailability(rid = data['rid'], checkin = data['checkin'], checkout= data['checkout']):
         
         b = Bookings(date_of_arrival = data['checkin'], date_of_departure = data['checkout'], nights = data['nights'], bedrooms = data['bedrooms'], guest = data['guest'], total_price = data['totalPrice'], room_id = data['rid'], user_id = data['uid'], status = 'confirmed', hotel_id = data['hid'])
         db.session.add(b)
@@ -265,13 +265,13 @@ def cancelBooking(bid, reason, cancelledBy):
         
     return False
 
-def checkAvailability(rid, rcategory, checkin, checkout):
+def checkAvailability(rid, checkin, checkout):
     
     room = Rooms.query.get(rid)
 
     bookedRooms = Bookings.query.join(Rooms).filter(
         Bookings.room_id == rid,
-        Rooms.category == rcategory,
+        
         ~(
             (Bookings.date_of_departure <= checkin) |
             (Bookings.date_of_arrival >= checkout)

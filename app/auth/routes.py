@@ -33,7 +33,7 @@ def register():
         return render_template('register.html', form = form)
 
     if form.validate_on_submit():
-        name = form.name.data
+        name = form.name.data.lower()
         email = form.email.data
         psw = generate_password_hash(form.password.data)
         role = form.identity.data
@@ -72,6 +72,7 @@ def verify():
             otp = form.otp.data
 
             if session['otp'] == otp:
+                session.pop('otp', None)
                 user = User_S.getUserByMail(session['email'])
 
                 # for forget password
@@ -79,8 +80,7 @@ def verify():
                     return redirect(url_for('auth.reset_password'))
 
                 User_S.updateVerifyMail(user)
-
-                session.pop('otp', None)
+                
                 flash('You Registered Successfully', 'flash-success')
 
                 createMail(subject='Registeration Success', send='svn@taglineinfotech.com', receiver=session['email'], content=f'You are Registered successfully in Hotel Booking Website')
@@ -110,10 +110,11 @@ def login():
         
         user = User_S.getUserByMail(email)
 
-        if user.email == email and check_password_hash(user.password, password):
+        if check_password_hash(user.password, password):
             session['user_id'] = user.id
             session['email'] = user.email
             session['role'] = user.role
+
             flash('Loged In.','flash-success')
 
             if user.role == 'host':
@@ -134,6 +135,7 @@ def login():
 def logout():
     session.pop('user_id', None)
     session.pop('email', None)
+    session.pop('role', None)
     return redirect(url_for('auth.login'))
 
 # Forget Password
@@ -155,7 +157,6 @@ def forget_password():
 
 # Reset Password
 @auth.route('/reset-password', methods = ['POST', 'GET'])
-@login_required
 def reset_password():
     resetForm = ResetPassForm()
     forgetForm = ForgetPassResetForm()
@@ -163,7 +164,6 @@ def reset_password():
      # Forget Password reset
     if forgetForm.validate_on_submit():
   
-        # print('in post method')
         new_pass = forgetForm.new_pass.data
         user = User_S.getUserByMail(session['email'])
        
@@ -176,7 +176,8 @@ def reset_password():
                 return redirect(url_for('auth.login'))
             else:
                 flash('User not found!', 'flash-err')
-                return redirect(url_for('auth.forget_password'))
+                return render_template('reset-password.html', forgetForm = forgetForm)
+
 
     # Reset Password
     if resetForm.validate_on_submit():
@@ -193,7 +194,6 @@ def reset_password():
         else: 
             flash('Invalid existing Password', 'flash-err')
 
-    session.pop('forgetPsw', None)
     if 'forgetPsw' in session:
         return render_template('reset-password.html', forgetForm = forgetForm)
         

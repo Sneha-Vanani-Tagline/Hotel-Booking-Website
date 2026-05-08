@@ -18,8 +18,10 @@ UPLOAD_FOLDER = 'app/static/images'
 @hotel.route('/list')
 @auth_required('host')
 def list():
-    data = Hotel.getHotelsData()
-    return render_template('hotel.html', data = data)
+    host = User.getUserById(session['user_id'])
+    hotels = host.hotels
+    
+    return render_template('hotel.html', data = hotels)
 
 @hotel.route('/edit/<int:id>', methods = ['GET', 'POST'])
 @auth_required('host')
@@ -32,11 +34,11 @@ def editHotel(id):
         return render_template('hotel_form.html', form = form, action='Edit', submit = 'Update')
     
     if form.validate_on_submit():
-        name = form.name.data
+        name = form.name.data.lower()
         desc = form.description.data
-        type = form.type.data
-        city = form.city.data
-        location = form.location.data
+        type = form.type.data.lower()
+        city = form.city.data.lower()
+        location = form.location.data.lower()
         images = form.images.data
         rooms = form.total_rooms.data
 
@@ -68,11 +70,11 @@ def addHotel():
     if form.validate_on_submit():
         host = User.getUserByMail(session['email'])
 
-        name = form.name.data
+        name = form.name.data.lower()
         desc = form.description.data
-        type = form.type.data
-        city = form.city.data
-        location = form.location.data
+        type = form.type.data.lower()
+        city = form.city.data.lower()
+        location = form.location.data.lower()
         rooms = form.total_rooms.data
 
         img = form.images.data
@@ -89,12 +91,5 @@ def addHotel():
         flash('Invalid Details', 'flash-err')
         return render_template('hotel_form.html', form = form, action='Add', submit = 'Add')
 
-# need check again
-@hotel.route('/view/<int:id>')
-def view(id):
-    hotelData = Hotel.getHotelDataById(id)
-    rooms = Hotel.getRoomsByHotelId(id)
-
-    return render_template('hotel-view.html', hotel = hotelData, rooms = rooms)
 
 

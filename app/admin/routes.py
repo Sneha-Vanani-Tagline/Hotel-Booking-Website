@@ -41,12 +41,14 @@ def login():
 @admin.route('/dashboard')
 @auth_required('admin')
 def dashboard():
+    today = date.today()
     users = User_cred.query.filter(User_cred.role != 'admin').count()
     hotels = db.session.query(Hotels).count()
-    bookings = Bookings.query.filter(Bookings.status == 'confirmed').count()
+    bookings = Bookings.query.filter(Bookings.status == 'confirmed', Bookings.date_of_departure >= today).count()
+    completedBooking = Bookings.query.filter(Bookings.status == 'confirmed', Bookings.date_of_departure < today).count()
     cancelBooking = Bookings.query.filter(Bookings.status == 'cancelled').count()
 
-    return render_template('dashboard.html', users=users, hotels=hotels, bookings=bookings, cancelBookings = cancelBooking)
+    return render_template('dashboard.html', users=users, hotels=hotels, bookings=bookings, cancelBookings = cancelBooking, completedBooking = completedBooking)
 
 # user list
 @admin.route('/userlist')
