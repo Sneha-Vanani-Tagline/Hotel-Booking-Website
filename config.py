@@ -1,9 +1,14 @@
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
 
 class Config:
-    SECRET_KEY = 'my-secret-key-1'
-
+    SECRET_KEY = os.getenv('SECRET_KEY')
+    
     # Database connection
-    SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:server1@localhost:5433/hotelDB'        # database system: // password @ port / database name
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # File uploading path
@@ -12,7 +17,7 @@ class Config:
     # Mail Config
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 465
-    MAIL_USERNAME = 'svn@taglineinfotech.com'
-    MAIL_PASSWORD = "tzni ywqu dqcr omyr"
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_USE_TLS = False
     MAIL_USE_SSL = True
