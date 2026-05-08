@@ -35,20 +35,20 @@ def home():
 @user.route('/rooms/<string:city>')
 def rooms(city):
     roomsData = Hotel_S.getAllRooms()
-    images = Hotel_S.getAllRoomImages()
-    facilities = Hotel_S.getAllRoomFacility()
     city = city.lower()
 
     cityRoom = []
     roomWise_img = {}
+    roomWise_facility = {}
   
     for r in roomsData:
         if r.hotel.city == city:
             cityRoom.append(r)
             # fetch image names
             roomWise_img[r.id] = Hotel_S.getRoomImageName_list(r.images)
+            roomWise_facility[r.id] = Hotel_S.getRoomFacility_nameList(r.facilities)
 
-    return render_template('rooms.html', city=city, rooms = cityRoom, images = roomWise_img)
+    return render_template('rooms.html', city=city, rooms = cityRoom, images = roomWise_img, facilities = roomWise_facility)
 
 # Search route
 @user.route('/search_rooms', methods = ['GET'])
@@ -74,6 +74,7 @@ def search_rooms():
 
     room_list = []
     roomwise_img = {}
+    roomWise_facility = {}
 
     # date filter
     if checkin and checkout:
@@ -86,15 +87,19 @@ def search_rooms():
                 room_list.append(room)
                 # fetch rooms images
                 roomwise_img[room.id] = Hotel_S.getRoomImageName_list(room.images)
+                roomWise_facility[room.id] = Hotel_S.getRoomFacility_nameList(room.facilities)
+    
     else:
         for room in rooms:
             room_list.append(room)
             # fetch rooms images
             roomwise_img[room.id] = Hotel_S.getRoomImageName_list(room.images)
+            roomWise_facility[room.id] = Hotel_S.getRoomFacility_nameList(room.facilities)
 
+  
     # current_date=date.isoformat() #gives date in yyyy-mm-dd formate in string
         
-    return render_template('rooms.html', rooms = room_list, images = roomwise_img)
+    return render_template('rooms.html', rooms = room_list, images = roomwise_img, facilities = roomWise_facility)
 
 @user.route('/room/<int:rid>', methods = ['GET', 'POST'])
 def room(rid):

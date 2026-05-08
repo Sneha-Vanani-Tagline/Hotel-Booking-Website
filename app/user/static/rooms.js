@@ -24,8 +24,9 @@ window.addEventListener('load', () => {
     })
 
     apply_filter.addEventListener('click', () => {
-        let price = Number(filter_price_slider.value)
-        let guest = Number(filter_guest.value)
+        // fetching search input
+        let price = Number(filter_price_slider.value);
+        let guest = Number(filter_guest.value);
         let rooms = Number(filter_rooms.value);
         let facility = [];
 
@@ -37,29 +38,48 @@ window.addEventListener('load', () => {
 
         console.log(price, guest, rooms, facility);
 
-            // work is pending
             room_div.forEach(room => {
-                let room_price = room.querySelector('.price').dataset.price;
-                let room_guest = room.querySelector('.guest').dataset.guest;
-                let room_rooms = room.querySelector('.rooms').dataset.rooms;
+                // fetching room data
+                let room_price = Number(room.querySelector('.price').dataset.price);
+                let room_guest = Number(room.querySelector('.guest').dataset.guest);
+                let room_rooms = Number(room.querySelector('.rooms').dataset.rooms);
+                let room_facilities = room.querySelectorAll('.facility');
+                
+                let room_facility_arr = [];
                 let isvisible = true
+                // creating room facilities array
+                room_facilities.forEach(f => {
+                    room_facility_arr.push(f.dataset.facility);
+                })
 
                 room.classList.add('hidden');
-                console.log(room_price, room_guest, room_rooms);
-
-                if (price == 20000 && Number(room_price) > price) {
-                    isvisible = false
+                
+                // price filter
+                if (room_price > price) {
+                    isvisible = false;
                 }
 
-                if (room_guest < guest) {
-                    isvisible = false
+                // guest filter
+                if (room_guest != 0 && room_guest < guest) {
+                    isvisible = false;
                 }
 
-                if (room_rooms < room) {
-                    isvisible = false
+                // rooms filter
+                if (rooms != 0 && room_rooms != rooms) {
+                    isvisible = false;
+                }
+
+                // facility filter
+                if (facility) {
+                    facility.forEach(f => {
+                        if (!room_facility_arr.includes(f)) {
+                            isvisible = false
+                        }
+                    })
                 }
 
                 if (isvisible) {
+                    console.log('true part')
                     room.classList.remove('hidden');
                 }
             });

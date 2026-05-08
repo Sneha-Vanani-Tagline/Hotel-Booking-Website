@@ -50,18 +50,34 @@
                                             <div class="row pt-2 ps-3">
                                                 <h5 class="card-title text-capitalize">{{ room.category }}</h5>
 
-                                                <div class="col-6">
-                                                    <p class="card-text text-capitalize"> 
-                                                        <strong>By {{ room.hotel.name }} </strong> <br>
-                                                        {{ room.hotel.location }}
-                                                    </p>
-                                                    <p class="card-text">
-                                                        <span class="rooms" data-rooms="{{ room.bedrooms }}">Bedrooms {{ room.bedrooms }}</span> <br>
-                                                        <span>Beds: {{ room.beds }}</span> <br>
-                                                        <span class="guest" data-guest="{{ room.person_capacity }}">Guest: {{ room.person_capacity }}</span> <br>
-                                                        <span class="price" data-price="{{ room.price_per_night }}">Price: {{ room.price_per_night }}/night</span> <br>
-                                                    </p>
-                                                </div>
+                                                
+                                                    <div class="row">
+                                                       
+                                                        <div class="col-6">
+                                                             <p class="card-text text-capitalize"> 
+                                                                <strong>By {{ room.hotel.name }} </strong> <br>
+                                                                {{ room.hotel.location }}
+                                                            </p>
+                                                            <p class="card-text">
+                                                                <span class="rooms" data-rooms="{{ room.bedrooms }}">Bedrooms {{ room.bedrooms }}</span> <br>
+                                                                <span>Beds: {{ room.beds }}</span> <br>
+                                                                <span class="guest" data-guest="{{ room.person_capacity }}">Guest: {{ room.person_capacity }}</span> <br>
+                                                                <span class="price" data-price="{{ room.price_per_night }}">Price: {{ room.price_per_night }}/night</span> <br>
+                                                            </p>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            {% if facilities %}
+                                                            <p class="card-text"> <strong>Amenities</strong>
+                                                                <ul>
+                                                                    {% for f in facilities[room.id] %}
+                                                                    <li class="facility" data-facility="{{ f }}">{{ f }}</li>
+                                                                    {% endfor %}
+                                                                </ul>
+                                                            </p>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                
                                             </div>
                                         </div>
 

@@ -184,6 +184,13 @@ def deleteRoomFacilityByRoomId_FacilityId(rid, fid):
     db.session.delete(f)
     db.session.commit()
 
+def getRoomFacility_nameList(facilities):
+    room_facility = []
+    for f in facilities:
+        room_facility.append(f.facility.name)
+
+    return room_facility
+
 # ----------------------- Rooms images -----------------------
 def addRoomImage(rid, imageName):
     image = Room_Image(room_id=rid, image = imageName)
