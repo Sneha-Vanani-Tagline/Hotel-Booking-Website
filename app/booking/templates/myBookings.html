@@ -42,7 +42,7 @@
                                 <h5 class="card-title text-capitalize">{{ room.category }}
                                             <small class="text-muted text-capitalize">| {{ room.hotel.name }} </small>
                                 </h5>
-
+                                
                                 <p class="card-text text-capitalize">{{ room.hotel.location }}</p>
 
                                 <p class="card-text text-capitalize">Trip Dates: <br>
@@ -60,24 +60,26 @@
 
                                 <p class="card-text">Price: {{ b.total_price }}</p>
 
+                                <!-- action buttons -->
                                 <div class="d-flex align-items-stretch gap-2 flex-row">
                                     {% if b.status == 'confirmed' %}
                                         <span class="booking-status badge bg-success d-flex align-items-center justify-content-center px-3 w-100">Confirmed</span>
-                                        <a href="#" class="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center w-100" data-bs-toggle="modal" data-bs-target="#cancelModal">Cancel</a>
+                                        <a href="#" class="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center w-100" data-bs-toggle="modal" data-bs-target="#cancelModal-{{ b.id }}">Cancel</a>
 
                                         <!-- Modal: on cancel click -->
-                                        <div class="modal fade" id="cancelModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                        <div class="modal fade" id="cancelModal-{{ b.id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                                                 <div class="modal-content">
                                                 <div class="modal-header">
                                                     <h1 class="modal-title fs-5" id="cancelModalLabel">Booking Cancelation</h1>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                 </div>
+
                                                 <!-- form: cancel reason -->
                                                 <form action="{{ url_for('booking.myBookings', uid=current_user.id) }}" method="post">
                                                     <div class="modal-body">
                                                         <h5 class="modal-title fs-6 text-capitalize mb-1" id="cancelModalLabel">{{ room.category }} - {{ room.hotel.name }}</h5>
-
+                                                        
                                                         <input type="hidden" value="{{ b.id }}" name="bookingid">
                                                         <label for="cancel_reason" class="form-label">Reason</label>
                                                         <textarea name="cancel_reason" id="cancel_reason" class="form-control"></textarea>

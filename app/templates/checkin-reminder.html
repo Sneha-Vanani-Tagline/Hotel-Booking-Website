@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Booking Reminder</title>
+</head>
+<body style="margin:0; padding:0; background:#f4f4f4; font-family:Arial, Helvetica, sans-serif;">
+
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4; padding:30px 0;">
+        <tr>
+            <td style="align-items:center;">
+
+                <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:10px; overflow:hidden;">
+
+                    <!-- Header -->
+                    <tr>
+                        <td style="background:#2563eb; padding:25px; text-align:center;">
+                            <h1 style="color:white; margin:0;">
+                                Check-in Reminder
+                            </h1>
+                        </td>
+                    </tr>
+
+                    <!-- Body -->
+                    <tr>
+                        <td style="padding:35px; color:#333;">
+
+                            <h2 style="margin-top:0;">
+                                Hello {{ user_name }},
+                            </h2>
+
+                            <p style="font-size:16px; line-height:1.7;">
+                                This is a reminder that your hotel booking check-in is tomorrow.
+                            </p>
+
+                            <table width="100%" cellpadding="10" cellspacing="0" style="margin-top:25px; border:1px solid #ddd; border-collapse:collapse;">
+
+                                <tr style="background:#f8f8f8;">
+                                    <td><strong>Booking ID</strong></td>
+                                    <td>{{ booking_id }}</td>
+                                </tr>
+
+                                <tr>
+                                    <td><strong>Hotel Name</strong></td>
+                                    <td>{{ hotel_name }}</td>
+                                </tr>
+
+                                <tr style="background:#f8f8f8;">
+                                    <td><strong>Room Type</strong></td>
+                                    <td>{{ room_type }}</td>
+                                </tr>
+
+                                <tr>
+                                    <td><strong>Check-in Date</strong></td>
+                                    <td>{{ checkin }}</td>
+                                </tr>
+
+                                <tr style="background:#f8f8f8;">
+                                    <td><strong>Check-out Date</strong></td>
+                                    <td>{{ checkout }}</td>
+                                </tr>
+
+                            </table>
+
+                            <p style="margin-top:30px; font-size:15px; line-height:1.7;">
+                                Please make sure to carry a valid ID proof during check-in.
+                            </p>
+
+                            <p style="font-size:15px; line-height:1.7;">
+                                We wish you a comfortable and pleasant stay.
+                            </p>
+
+                            <p style="margin-top:35px;">
+                                Regards,<br>
+                                <strong>Hotel Booking Team</strong>
+                            </p>
+
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background:#f8f8f8; padding:20px; text-align:center; font-size:13px; color:#777;">
+                            This is an automated email. Please do not reply.
+                        </td>
+                    </tr>
+
+                </table>
+
+            </td>
+        </tr>
+    </table>
+
+</body>
+</html>
