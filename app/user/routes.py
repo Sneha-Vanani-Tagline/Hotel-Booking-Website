@@ -149,6 +149,8 @@ def room(rid):
 @user.route('/payment')
 @auth_required('user')
 def payment():
+    room = ''
+    bookingData = ''
 
     if 'rid' in session and 'booking' in session:
         room = Hotel_S.getRoomById(session['rid'])

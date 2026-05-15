@@ -235,7 +235,7 @@ def addBooking(data):
         b = Bookings(date_of_arrival = data['checkin'], date_of_departure = data['checkout'], nights = data['nights'], bedrooms = data['bedrooms'], guest = data['guest'], total_price = data['totalPrice'], room_id = data['rid'], user_id = data['uid'], status = 'confirmed', hotel_id = data['hid'])
         db.session.add(b)
         db.session.commit()
-        return True
+        return b.id
     
     else:
         return False
