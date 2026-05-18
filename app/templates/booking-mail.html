@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head> -->
+<body>
+    {% if target == 'success' %}
+        <h2>Booking Confirmed</h2>
+
+        <p>Hello {{ user_name }},</p>
+
+        <p>Your booking has been confirmed successfully.</p>
+
+        <hr>
+
+        <p><strong>Booking ID:</strong> #{{ booking_id }}</p>
+        <p><strong>Hotel:</strong> {{ hotel_name }}</p>
+        <p><strong>Room:</strong> {{ room_type }}</p>
+        <p><strong>Check-In:</strong> {{ checkin }}</p>
+        <p><strong>Check-Out:</strong> {{ checkout }}</p>
+
+        <hr>
+
+        <p>Thank you for choosing us.</p>
+
+    {% elif target == 'cancel' %}
+
+        <h2>Booking Cancelled</h2>
+
+        <p>Hello {{ user_name }},</p>
+
+        <p>Your booking has been Cancelled.</p>
+
+        <hr>
+
+        <p><strong>Booking ID:</strong> #{{ booking_id }}</p>
+        <p><strong>Hotel:</strong> {{ hotel_name }}</p>
+        <p><strong>Room:</strong> {{ room_type }}</p>
+        <p><strong>Cancelled By:</strong> {{ cancel_by }}</p>
+        <p><strong>Cancellation Reason:</strong> {{ cancel_reason }}</p>
+
+
+        {% if refund_amount %} 
+            <p><strong>Refund Amount:</strong> ₹{{ refund_amount }}</p> 
+        {% endif %}
+
+        <hr>
+
+        <p> We hope to serve you again in the future. </p>
+        <p>Thank you for choosing us.</p>
+    {%endif %}
+</body>
+</html>

@@ -11,18 +11,19 @@ from app.models import User_cred
 import app.services.hotel_service as Hotel_S
 import app.services.user_service as User_S
 from .decorator import auth_required, login_required
+from app.tasks import createMail
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+sender_mail = os.getenv('MAIL_USERNAME')
+
 
 UPLOAD_FOLDER = 'app/static/images'
 
 # OTP Generator
 def genrateOTP():
     return int(random.randint(100000, 999999))
-
-# Mail Creation and sending
-def createMail(send, receiver, subject, content):
-    msg = Message(subject, sender=send, recipients=[receiver])
-    msg.body = content
-    mail.send(msg)
 
 # Register route
 @auth.route('/register', methods = ['GET', 'POST'])
@@ -47,7 +48,7 @@ def register():
             User_S.insertUser(name=name, email = email, image=fname, psw = psw, role = role)
         else:
             User_S.insertUser(name=name, email = email, psw = psw, role = role)
-        # print(name, email, psw, role)
+      
         return redirect(url_for('auth.verify'))
     else:
         flash('Invalid details or Missing fields', 'flash-err')
@@ -63,7 +64,7 @@ def verify():
         otp = genrateOTP()
         session['otp'] = otp
 
-        createMail(subject='OTP Verification', send='svn@taglineinfotech.com', receiver=session['email'], content=f'Your OTP is {otp} from Hotel Booking Website to verify user.')
+        createMail.delay(subject='OTP Verification', send=sender_mail, receiver=session['email'], content=f'Your OTP is {otp} from Hotel Booking Website to verify user.')
 
         return render_template('verify.html', form = form)
 
@@ -83,7 +84,7 @@ def verify():
                 
                 flash('You Registered Successfully', 'flash-success')
 
-                createMail(subject='Registeration Success', send='svn@taglineinfotech.com', receiver=session['email'], content=f'You are Registered successfully in Hotel Booking Website')
+                createMail.delay(subject='Registeration Success', send=sender_mail, receiver=session['email'], content=f'You are Registered successfully in Hotel Booking Website')
 
                 return redirect(url_for('auth.login'))
             else:

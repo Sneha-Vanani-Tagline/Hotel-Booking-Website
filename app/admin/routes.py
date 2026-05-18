@@ -11,6 +11,13 @@ from app.models import User_cred, Bookings, Hotels, Rooms
 import app.services.user_service as User_S
 import app.services.hotel_service as Hotel_S
 from app.auth.decorator import auth_required, login_required
+from app.tasks import cancelBooking_Mail
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+sender_mail = os.getenv('MAIL_USERNAME')
+
 
 # Get Admin User
 def getUser(mail):
@@ -65,6 +72,7 @@ def userlist():
 def bookinglist():
     bookings = Hotel_S.getAllBookings()
 
+    # cancel booking
     if request.method == 'POST':
         bid = request.form.get('bookingid')
         current_booking = Hotel_S.getBooking_ById(bid)
@@ -72,6 +80,9 @@ def bookinglist():
         cancelled_by = 'admin'
 
         Hotel_S.cancelBooking(bid=bid, reason=reason, cancelledBy=cancelled_by)
+        
+        cancelBooking_Mail.delay(subject='Booking Cancelled', send=sender_mail, receiver=current_booking.user.email, uname=current_booking.user.name, bid=current_booking.id, hotel_name=current_booking.hotel.name, room=current_booking.rooms.category, cancel_by= 'Super Admin', price=current_booking.total_price, reason = reason)
+
         flash('Booking cancelled!', 'flash-success')
         
 

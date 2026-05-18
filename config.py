@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 import os
+from celery.schedules import crontab
 
 # Load environment variables from .env file
 load_dotenv()
@@ -21,3 +22,18 @@ class Config:
     MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
     MAIL_USE_TLS = False
     MAIL_USE_SSL = True
+
+    CELERY = {
+        'broker_url': 'redis://localhost:6379/0',
+        'result_backend': 'redis://localhost:6379/0',
+        
+        'timezone': 'Asia/Kolkata',
+        'enable_utc': False,
+    
+        'beat_schedule' : {
+            'check-for-reminder-every-morning' : {
+                'task' : 'app.tasks.check_booking_reminder',
+                'schedule' : crontab(hour=8, minute=0),
+            }
+        }
+    }
