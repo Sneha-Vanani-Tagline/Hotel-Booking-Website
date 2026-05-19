@@ -28,27 +28,31 @@ def list():
 def editHotel(id):
     data = Hotel.getHotelDataById(id)
     form = HotelForm(obj = data)
-
-    if request.method == 'GET':
-
-        return render_template('hotel_form.html', form = form, action='Edit', submit = 'Update')
     
     if form.validate_on_submit():
-        name = form.name.data.lower()
+        name = form.name.data
         desc = form.description.data
-        type = form.type.data.lower()
+        type = form.type.data
         city = form.city.data.lower()
-        location = form.location.data.lower()
-        images = form.images.data
-        rooms = form.total_rooms.data
+        location = form.location.data
+        images = form.images.data       #this gives file object
 
-        if images and images.filename != '':
-            fname = secure_filename(images.filename)
-            images.save(os.path.join(UPLOAD_FOLDER, fname))
-            Hotel.updateData(id= id,name=name, description=desc, type=type, city=city, location=location, images=fname, rooms=rooms)
+        result = check_data_changes(name,desc,type, city, location, images, data)
+
+        if result:
+            if 'image' in result:
+                # image = result['image']       #this gives string, so not using this varialble to store image
+                fname = secure_filename(images.filename)
+                images.save(os.path.join(UPLOAD_FOLDER, fname))
+            
+            Hotel.updateHotelData(id, result)
+
+            flash('Hotel Edited Successfully', 'flash-success')
+            return redirect(url_for('hotel.list'))
         else:
-            Hotel.updateData(id=id, name=name, description=desc, type=type, city=city, location=location, rooms=rooms)
-        return redirect(url_for('hotel.list'))
+            flash('No changes found!', 'flash-warn')
+    
+    return render_template('hotel_form.html', form = form, action='Edit', submit = 'Update', hotelImage = data.images)
 
 # deletes hotel
 @hotel.route('/delete/<int:id>')
@@ -70,12 +74,12 @@ def addHotel():
     if form.validate_on_submit():
         host = User.getUserByMail(session['email'])
 
-        name = form.name.data.lower()
+        name = form.name.data
         desc = form.description.data
-        type = form.type.data.lower()
+        type = form.type.data
         city = form.city.data.lower()
-        location = form.location.data.lower()
-        rooms = form.total_rooms.data
+        location = form.location.data
+        
 
         img = form.images.data
         print(img)
@@ -92,4 +96,36 @@ def addHotel():
         return render_template('hotel_form.html', form = form, action='Add', submit = 'Add')
 
 
+# check updates for edit hotel
+def check_data_changes(name, desc, type, city, location, image, hotelData):
+    changeFlag = False
+    changed = {}
 
+    if name and name != hotelData.name:
+        changed['name'] = name
+        changeFlag = True
+
+    if desc and desc != hotelData.description:
+        changed['desc'] = desc
+        changeFlag = True
+
+    if type and type != hotelData.type:
+        changed['type'] = type
+        changeFlag = True
+
+    if city and city.lower() != hotelData.city.lower():
+        changed['city'] = city.lower()
+        changeFlag = True
+
+    if location and location != hotelData.location:
+        changed['location'] = location
+        changeFlag = True
+
+    if image and image.filename != '' and image != hotelData.images:
+        changed['image'] = image.filename
+        changeFlag = True
+
+    if changeFlag:
+        return changed
+    else:
+        return changeFlag

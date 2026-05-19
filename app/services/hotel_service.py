@@ -17,28 +17,35 @@ def getAllHotels():
     return data
     
 
-def updateData(**data):
-    hotel = Hotels.query.get(data['id'])
+def updateHotelData(id, data):
+    hotel = Hotels.query.get(id)
+    if 'name' in data:
+        hotel.name = data['name']
 
-    hotel.name = data['name']
-    hotel.type = data['type']
-    hotel.description = data['description']
-    hotel.city = data['city']
-    hotel.location = data['location']
-    hotel.total_rooms = data['rooms']
+    if data.get('type', None) != None:
+        hotel.type = data['type']
 
-    if data.get('images', None) != None:
-        hotel.images = data['images']
-    # print(hotel)
+    if 'desc' in data:
+        hotel.description = data['desc']
+
+    if 'city' in data:
+        hotel.city = data['city']
+
+    if 'location' in data:
+        hotel.location = data['location']
+
+    if data.get('image', None) != None:
+        hotel.images = data['image']
+
     db.session.commit()
 
 def createHotel(**data):
     hotel = {}
 
     if data.get('images', None) != None:
-        hotel = Hotels(name=data['name'], description = data['description'], type = data['type'], city = data['city'], location = data['location'], images = data['images'], total_rooms = data['rooms'], host_id = data['host_id'])
+        hotel = Hotels(name=data['name'], description = data['description'], type = data['type'], city = data['city'], location = data['location'], images = data['images'], host_id = data['host_id'])
     else:
-        hotel = Hotels(name=data['name'], description = data['description'], type = data['type'], city = data['city'], location = data['location'], total_rooms = data['rooms'], host_id = data['host_id'])
+        hotel = Hotels(name=data['name'], description = data['description'], type = data['type'], city = data['city'], location = data['location'], host_id = data['host_id'])
 
     db.session.add(hotel)
     db.session.commit()
@@ -73,7 +80,7 @@ def addRoom(**data):
         addRoomFacilityByRoomId_FacilityId(room.id, fid)
 
 # edit room
-def editRoom(rid, deleteImages, data):
+def editRoom(rid, data):
     room = getRoomById(rid)
     roomImgs = getRoomImageById(rid)
     roomFacility = getRoomFacilityByRoomId(rid)
@@ -96,31 +103,29 @@ def editRoom(rid, deleteImages, data):
     if data.get('no_rooms', None) != None:
         room.no_rooms = data['no_rooms']
 
-    if data.get('images', None) != None:
-        # print('in images edit in services')
-        existingImageName = [n.image for n in roomImgs]
+    if data.get('deleteImages', None) != None:
+        print('room edit service: delete images')
+        for id in data['deleteImages']:
+            deleteImageByImageId(id)
 
-        addImage = list(set(data['images']) - set(existingImageName))
+    if data.get('newImages', None) != None:
+        print('room edit service: add images')
 
         # if fid has multiple name, so we can access one by one using loop
-        for iname in addImage:
-            addRoomImage(rid, iname)
-
-        for id in deleteImages:
-            deleteImageByImageId(id)
+        for img in data['newImages']:
+            addRoomImage(rid, img)
         
-    if data.get('facility', None) != None:
-        
-        existingFId = [f.facility_id for f in roomFacility]
-        
-        addId = list(set(data['facility']) - set(existingFId))
-        removeId = list(set(existingFId) - set(data['facility']))
+    if data.get('newFacilities', None) != None:
+        print('room edit service: add facility')
        
         # if fid has multiple id, so we can access id one by one using loop
-        for fid in addId:
+        for fid in data['newFacilities']:
             addRoomFacilityByRoomId_FacilityId(rid, fid)
+    
+    if data.get('deleteFacilities', None) != None:
+        print('room edit service: remove facility')
 
-        for fid in removeId:
+        for fid in data['deleteFacilities']:
             deleteRoomFacilityByRoomId_FacilityId(rid, fid)
 
     db.session.commit()

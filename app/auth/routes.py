@@ -34,7 +34,7 @@ def register():
         return render_template('register.html', form = form)
 
     if form.validate_on_submit():
-        name = form.name.data.lower()
+        name = form.name.data
         email = form.email.data
         psw = generate_password_hash(form.password.data)
         role = form.identity.data

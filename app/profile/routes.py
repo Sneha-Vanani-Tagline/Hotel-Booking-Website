@@ -20,23 +20,39 @@ def view(id):
 def edit(id):
     user = UserS.getUserById(id)
     form = UserForm(obj = user)
-
-    if request.method == 'GET':
-        return render_template('edit-user.html', form = form, data=user)
     
     if form.validate_on_submit():
-        name = form.name.data.lower()
+        name = form.name.data
         image = form.image.data
 
-        # print(user.id)
-        if image and image.filename != '':
-            fname = secure_filename(image.filename)
-            image.save(os.path.join(UPLOAD_FOLDER, fname))
-            UserS.updateUser(name=name, image=fname, id=id)
-            flash('Details Updated', 'flash-success')
+        result = check_profile_changes(name, image, user)
+
+        if result:
+                UserS.updateUser(result, id)
+                flash('Details Updated', 'flash-success')
+                return redirect(url_for('profile.view', id = id))
         else:
-            UserS.updateUser(name=name, id=id)
-            flash('Details Updated', 'flash-success')
-        return redirect(url_for('profile.view', id = id))
+            flash('No changes found!', 'flash-warn')
+            return render_template('edit-user.html', form = form, data=user,userImage=user.image)
+    
+    return render_template('edit-user.html', form = form, data=user, userImage=user.image)
+    
+def check_profile_changes(name, image, userData):
+    changeFlag = False
+    changed = {}
+
+    if name and name != userData.name:
+        changed['name'] = name
+        changeFlag = True
+
+    if image and image.filename != '' and image != userData.image:
+        
+        fname = secure_filename(image.filename)
+        image.save(os.path.join(UPLOAD_FOLDER, fname))
+        changed['image'] = fname
+        changeFlag = True
+
+    if changeFlag:
+        return changed
     else:
-        return render_template('edit-user.html', form = form, data=user)
+        return changeFlag

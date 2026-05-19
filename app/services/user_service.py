@@ -27,9 +27,11 @@ def insertUser(**data):
     print('User Added.')
 
 # Update User record
-def updateUser(**data):
-    user = getUserById(data['id'])
-    user.name = data['name']
+def updateUser(data, uid):
+    user = getUserById(uid)
+
+    if 'name' in data:
+        user.name = data['name']
 
     if data.get('image', None) != None:
         user.image = data['image']

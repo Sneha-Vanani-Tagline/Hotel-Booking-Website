@@ -8,7 +8,6 @@ class Hotels(db.Model):
     city = db.Column(db.String(50), nullable = False)
     location = db.Column(db.String(200), nullable = False)
     images = db.Column(db.String(100), default = 'default_hotel.avif')
-    total_rooms = db.Column(db.Integer, nullable = False)
     
 
     host_id = db.Column(db.Integer, db.ForeignKey('user_cred.id'))

@@ -3,7 +3,6 @@ from flask import flash, session, render_template, redirect, url_for, request
 from app.admin.form import LoginForm
 import random
 from datetime import date, datetime, timezone
-from flask_mail import Message
 from app import mail,db
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash

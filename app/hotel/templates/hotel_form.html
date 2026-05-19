@@ -14,28 +14,18 @@
 
             {{ form.hidden_tag() }}
             <div class="row mb-3">
-                <div class="input-div form-group">
+                <div class="input-div form-group col-6">
                     {{ form.name.label }}
                     {{ form.name(class_="form-control") }}
                     {% for err in form.name.errors %}
                         <span class="input-err">{{ err }}</span>
                     {% endfor %}
                 </div>
-            </div>
 
-            <div class="row mb-3">
-                <div class="input-div form-group col-7">
+                <div class="input-div form-group col-6">
                     {{ form.type.label }}
                     {{ form.type(class_="form-control") }}
                     {% for err in form.type.errors %}
-                        <span class="input-err">{{ err }}</span>
-                    {% endfor %}
-                </div>
-
-                <div class="input-div form-group col-5">
-                    {{ form.total_rooms.label }}
-                    {{ form.total_rooms(class_="form-control") }}
-                    {% for err in form.total_rooms.errors %}
                         <span class="input-err">{{ err }}</span>
                     {% endfor %}
                 </div>
@@ -54,7 +44,7 @@
             <div class="row mb-3">
                 <div class="input-div form-group col-md-7">
                     {{ form.images.label }}
-                    {{ form.images }}
+                    {{ form.images(class_="form-control") }}
                     {% for err in form.images.errors %}
                         <span class="input-err">{{ err }}</span>
                     {% endfor %}
@@ -67,6 +57,13 @@
                     {% endfor %}
                 </div>
             </div>
+
+            {% if hotelImage %}
+            <p>Existing Image</p>
+            <div class="card mb-3" style="width:10rem ;">
+                <img src="{{ url_for('static', filename='images/' + hotelImage) }}" class="card-img-top img" alt="Profile Image">
+            </div>
+            {% endif %}
                 
             <div class="row mb-3">
                 <div class="input-div form-group col-md-12">
