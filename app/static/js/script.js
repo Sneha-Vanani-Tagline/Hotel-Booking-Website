@@ -2,6 +2,7 @@ window.addEventListener('load', () => {
 
     const checkin_search = document.querySelector('#search-checkin');
     const checkout_search = document.querySelector('#search-checkout');
+    const alert_Msg = document.querySelector('#alert-msg');
 
     const today = new Date().toISOString().split("T")[0];
 
@@ -22,5 +23,8 @@ window.addEventListener('load', () => {
             alert('Checkout date must be greater that Checkin!')
         }
     })
-    // checkout.min = checkin.value;
+    
+
+    
+
 })

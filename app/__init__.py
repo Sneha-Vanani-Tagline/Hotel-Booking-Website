@@ -1,7 +1,7 @@
 from flask import Flask, has_request_context
 # from flask_login import login_manager, login_user, logout_user,current_user
 from config import Config
-from .extensions import db, mail
+from .extensions import db, mail, socketio
 from .auth import auth
 from .admin import admin
 from .host import host
@@ -14,6 +14,8 @@ from flask_migrate import Migrate
 from flask import session
 from .models import User_cred, Facilities
 from celery import Celery, Task
+from flask_socketio import SocketIO
+
 
 
 def celery_init_app(app):
@@ -39,6 +41,7 @@ def create_app():
     migrate = Migrate(app1, db)
     mail.init_app(app1)
     celery_init_app(app1)
+    socketio.init_app(app1, cors_allowed_origins="*")
 
     @app1.context_processor
     def inject_user():
@@ -76,5 +79,6 @@ def create_app():
     
     import app.models   # ✅ triggers all model imports
     import app.tasks
+    import app.socket
 
     return app1

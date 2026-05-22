@@ -9,8 +9,8 @@
                     <h5>Proceed to Pay</h5>
                     <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate, unde.</p>
                 
-                    <form action="{{ url_for('booking.saveBooking') }}" class="pe-4" method="post">
-                        <input type="submit" class="btn btn-dark w-100" value="Pay">
+                    <form action="{{ url_for('booking.saveBooking') }}" class="pe-4" method="post" id="payment-form">
+                        <input type="submit" class="btn btn-dark w-100" value="Pay" id="payment-btn">
                     </form>
                 </div>
 

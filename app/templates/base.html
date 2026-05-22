@@ -344,6 +344,7 @@
                         </form>
                     </div>
 
+                    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
                 {% endif %}
 
                 <!-- Login / Logout icon -->
@@ -396,6 +397,7 @@
 
             <!-- Body -->
             <div class="col-md-9 col-lg-10 p-5">
+
                 <!-- flash Messages  -->
                 <div class="row d-flex">
                     <div class="flash-div col-6 flex-end">
@@ -422,6 +424,7 @@
                             {% endif %}
                         {% endwith %}
                     </div>
+                    
                 </div>
                 
                 <!-- Main content  -->
@@ -475,8 +478,19 @@
         <button class="btn btn-danger w-100" id="apply-filter">Apply Filters</button>
     </div>
 
+
+    {% if current_user %}
+    <script>
+        window.userId = "{{ current_user.id }}"
+        window.userRole = "{{ current_user.role }}"
+
+    </script>
+    {% endif %}
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.8.1/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='js/socket.js') }}"></script>
+    
     {% block js %} {% endblock %}
 </body>
 </html>
