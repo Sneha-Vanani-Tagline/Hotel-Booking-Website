@@ -80,7 +80,7 @@ def check_booking_reminder():
             booking_id = b.id,
             hotel_name = b.hotel.name,
             room_type = b.rooms.category,
-            checkin=b.dadate_of_arrivalte_of,
+            checkin=b.date_of_arrival,
             checkout=b.date_of_departure,
         )
         mail.send(msg)

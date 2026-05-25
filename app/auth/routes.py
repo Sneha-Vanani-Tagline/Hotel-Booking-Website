@@ -14,6 +14,8 @@ from .decorator import auth_required, login_required
 from app.tasks import createMail
 import os
 from dotenv import load_dotenv
+from app.extensions import socketio
+
 
 load_dotenv()
 sender_mail = os.getenv('MAIL_USERNAME')
@@ -81,7 +83,10 @@ def verify():
                     return redirect(url_for('auth.reset_password'))
 
                 User_S.updateVerifyMail(user)
-                
+
+                socketio.emit('new_user_registered', user.name, to='super_admin')
+                socketio.emit('update_admin_dashboard', to='super_admin')
+
                 flash('You Registered Successfully', 'flash-success')
 
                 createMail.delay(subject='Registeration Success', send=sender_mail, receiver=session['email'], content=f'You are Registered successfully in Hotel Booking Website')
@@ -111,22 +116,25 @@ def login():
         
         user = User_S.getUserByMail(email)
 
-        if check_password_hash(user.password, password):
-            session['user_id'] = user.id
-            session['email'] = user.email
-            session['role'] = user.role
+        if user:
+            if check_password_hash(user.password, password):
+                session['user_id'] = user.id
+                session['email'] = user.email
+                session['role'] = user.role
 
-            flash('Loged In.','flash-success')
+                flash('Loged In.','flash-success')
 
-            if user.role == 'host':
-                return redirect(url_for('host.dashboard'))
-            elif user.role == 'admin':
-                return redirect(url_for('admin.dashboard'))
+                if user.role == 'host':
+                    return redirect(url_for('host.dashboard'))
+                elif user.role == 'admin':
+                    return redirect(url_for('admin.dashboard'))
+                else:
+                    return redirect(url_for('user.home'))
             else:
-                return redirect(url_for('profile.view', id = user.id))
+                flash('Invalid Details', 'flash-err')
         else:
-            flash('Invalid Details', 'flash-err')
-            return render_template('login.html', form = form)
+            flash('User not found!', 'flash-err')
+        return render_template('login.html', form = form)
     else:
         return render_template('login.html', form = form)
     

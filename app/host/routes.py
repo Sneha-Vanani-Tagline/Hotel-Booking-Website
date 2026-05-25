@@ -13,32 +13,32 @@ from app.auth.decorator import auth_required, login_required
 @host.route('/dashboard')
 @auth_required('host')
 def dashboard():
-    if session['user_id']:
+    print('in host dashboard route')
         
-        user = User_S.getUserById(session['user_id'])
-        hotel = Hotels.query.filter(Hotels.host_id == user.id).count()
-        total_rooms = 0
+    user = User_S.getUserById(session['user_id'])
+    hotel = Hotels.query.filter(Hotels.host_id == user.id).count()
+    total_rooms = 0
 
-        for h in user.hotels:
-            room = Rooms.query.filter(Rooms.hotel_id == h.id).count()
-            total_rooms = total_rooms + room
+    for h in user.hotels:
+        room = Rooms.query.filter(Rooms.hotel_id == h.id).count()
+        total_rooms = total_rooms + room
 
-        active_bookings = 0
-        completed_bookings = 0
-        cancelled_bookings = 0
+    active_bookings = 0
+    completed_bookings = 0
+    cancelled_bookings = 0
+    
+    for h in user.hotels:
+        today = date.today()
+        active = Bookings.query.filter(Bookings.hotel_id == h.id, Bookings.status == 'confirmed', Bookings.date_of_departure >= today).count()
+        active_bookings = active_bookings + active
         
-        for h in user.hotels:
-            today = date.today()
-            active = Bookings.query.filter(Bookings.hotel_id == h.id, Bookings.status == 'confirmed', Bookings.date_of_departure >= today).count()
-            active_bookings = active_bookings + active
-            
-            completed = Bookings.query.filter(Bookings.hotel_id == h.id, Bookings.status == 'confirmed', Bookings.date_of_departure < today).count()
-            completed_bookings = completed_bookings + completed
+        completed = Bookings.query.filter(Bookings.hotel_id == h.id, Bookings.status == 'confirmed', Bookings.date_of_departure < today).count()
+        completed_bookings = completed_bookings + completed
 
-            cancel = Bookings.query.filter(Bookings.hotel_id == h.id, Bookings.status == 'cancelled').count()
-            cancelled_bookings = cancelled_bookings + cancel
+        cancel = Bookings.query.filter(Bookings.hotel_id == h.id, Bookings.status == 'cancelled').count()
+        cancelled_bookings = cancelled_bookings + cancel
 
-        return render_template('hostDashboard.html', hostUser = user, hotels = hotel, rooms = total_rooms, active_bookings = active_bookings, completed_bookings = completed_bookings, cancelled_bookings = cancelled_bookings)
+    return render_template('hostDashboard.html', hostUser = user, hotels = hotel, rooms = total_rooms, active_bookings = active_bookings, completed_bookings = completed_bookings, cancelled_bookings = cancelled_bookings)
         
     
     

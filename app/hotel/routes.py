@@ -11,6 +11,7 @@ from app.models import User_cred,Hotels, Rooms, Room_Image, Facilities, Room_fac
 import app.services.hotel_service as Hotel
 import app.services.user_service as User
 from app.auth.decorator import auth_required, login_required
+from app.extensions import socketio
 
 UPLOAD_FOLDER = 'app/static/images'
 
@@ -79,16 +80,18 @@ def addHotel():
         type = form.type.data
         city = form.city.data.lower()
         location = form.location.data
-        
 
         img = form.images.data
-        print(img)
+        
         if img and img.filename != '':
             fname = secure_filename(img.filename)
             img.save(os.path.join(UPLOAD_FOLDER, fname))
-            Hotel.createHotel(name= name, description=desc, type=type, city=city, location=location, images=fname, rooms=rooms, host_id = host.id)
+            Hotel.createHotel(name= name, description=desc, type=type, city=city, location=location, images=fname, host_id = host.id)
         else:
-            Hotel.createHotel(name= name, description=desc, type=type, city=city, location=location, rooms=rooms, host_id = host.id)
+            Hotel.createHotel(name= name, description=desc, type=type, city=city, location=location, host_id = host.id)
+        
+        socketio.emit('update_admin_dashboard', to='super_admin')
+        
         flash('Hotel Added Successfully', 'flash-success')
         return redirect(url_for('hotel.list'))
     else:

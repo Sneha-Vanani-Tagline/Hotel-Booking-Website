@@ -5,8 +5,8 @@
 {% endblock %}
 
 {% block content %}
-    {% if current_user %}
-        {% set host = current_user %}
+    {% if hostUser %}
+        <p class="hidden user_id">{{ hostUser.id }}</p>
 
         <div class="stats d-flex gap-4 text-center">
             
@@ -73,3 +73,16 @@
         </div>
     {% endif %}
 {% endblock %}
+
+{% block js %} 
+        <script>
+            window.addEventListener('load', () => {
+               
+                let id = document.querySelector('.user_id').innerText;
+
+                socket.emit('join_host', id);
+                
+            })
+        </script>
+{% endblock %}
+

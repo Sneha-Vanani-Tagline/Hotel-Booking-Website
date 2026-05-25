@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    {% if current_user %}
+    <p class="hidden user_id">{{ current_user.id }}</p>
+    {% endif %}
+
     {% if cityWise_room %}
         {% for city in cityWise_room %}
             <a href="{{ url_for('user.rooms', city=city) }}" style="color: black;">
@@ -29,4 +33,19 @@
         {% endfor %}
     {% endif %}
 {% endblock %}
+
+
+{% block js %} 
+    <script>
+        window.addEventListener('load', () => {
+
+            let id = document.querySelector('.user_id').innerText;
+
+            socket.emit('join_user', id);
+            
+        });
+    </script>
+{% endblock %}
+
+
 

@@ -13,6 +13,8 @@ from app.auth.decorator import auth_required, login_required
 from app.tasks import cancelBooking_Mail
 import os
 from dotenv import load_dotenv
+from app.extensions import socketio
+
 
 load_dotenv()
 sender_mail = os.getenv('MAIL_USERNAME')
@@ -82,8 +84,16 @@ def bookinglist():
         
         cancelBooking_Mail.delay(subject='Booking Cancelled', send=sender_mail, receiver=current_booking.user.email, uname=current_booking.user.name, bid=current_booking.id, hotel_name=current_booking.hotel.name, room=current_booking.rooms.category, cancel_by= 'Super Admin', price=current_booking.total_price, reason = reason)
 
-        flash('Booking cancelled!', 'flash-success')
+        event_data = {
+                'room': current_booking.rooms.category,
+                'hotelName': current_booking.hotel.name
+            }
         
+        socketio.emit('booking_cancelled', event_data, to=f'user_{current_booking.user_id}')
+        socketio.emit('update_host_dashboard', to=f'host_{current_booking.hotel.host_id}')
+        socketio.emit('update_myBookings', to=f'user_{current_booking.user_id}')
+
+        flash('Booking cancelled!', 'flash-success')
 
     return render_template('bookinglist.html', bookings=bookings)
 

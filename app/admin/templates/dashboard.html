@@ -72,3 +72,14 @@
         </div>
     {% endif %}
 {% endblock %}
+
+{% block js %} 
+        <script>
+            window.addEventListener('load', () => {
+                 
+                console.log('Admin dashboard script');
+                
+                socket.emit('join_admin');
+            })
+        </script>
+{% endblock %}

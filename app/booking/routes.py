@@ -7,6 +7,8 @@ from app.auth.decorator import auth_required, login_required
 from app.tasks import bookingSuccess_Mail,cancelBooking_Mail
 import os
 from dotenv import load_dotenv
+# import app.socket as Socket 
+from app.extensions import socketio
 
 load_dotenv()
 sender_mail = os.getenv('MAIL_USERNAME')
@@ -43,6 +45,21 @@ def saveBooking():
     result = Hotel_S.addBooking(data)
 
     if result:
+        
+        data = {'hotelName' : room.hotel.name, 'bookerName': user.name, 'roomName': f'host_{room.hotel.host_id}'}
+
+        socketio.emit('booking_created', 
+                    data, 
+                    to=f'host_{room.hotel.host_id}')
+        socketio.emit('update_host_dashboard', to=f'host_{room.hotel.host_id}')
+        
+        
+        data = {'hotelName' : room.hotel.name, 'bookerName': user.name, 'roomName': 'super_admin'}
+        socketio.emit('booking_created', 
+                    data, 
+                    room='super_admin')
+        socketio.emit('update_admin_dashboard', to='super_admin')
+        
 
         bookingSuccess_Mail.delay(
             subject='Booking Successful',
@@ -90,12 +107,16 @@ def myBookings(uid):
         cancelled_by = 'user'
 
         diff = (current_booking.date_of_arrival - datetime.now(timezone.utc).date()).days
-        print(diff)
 
         if diff >= 2:
             Hotel_S.cancelBooking(bid=bid, reason=reason, cancelledBy=cancelled_by)
             
             cancelBooking_Mail.delay(subject='Booking Cancelled', send=sender_mail, receiver=session['email'], uname=user.name, bid=current_booking.id, hotel_name=current_booking.hotel.name, room=current_booking.rooms.category, cancel_by= 'You', price=current_booking.total_price, reason = reason)
+            
+            # Updating dashboard
+            socketio.emit('update_host_dashboard', to=f'host_{current_booking.hotel.host_id}')
+            socketio.emit('update_admin_dashboard', to='super_admin')
+
             flash('Booking cancelled!', 'flash-success')
         else:
             flash('Cancellation is no longer allowed. Bookings can only be cancelled at least 2 days before the check-in date!', 'flash-err')
@@ -122,6 +143,16 @@ def allBookings():
             Hotel_S.cancelBooking(bid=bid,reason=reason,cancelledBy=cancelled_by)
             
             cancelBooking_Mail.delay(subject='Booking Cancelled', send=sender_mail, receiver=current_booking.user.email, uname=current_booking.user.name, bid=current_booking.id, hotel_name=current_booking.hotel.name, room=current_booking.rooms.category, cancel_by= 'Hotel Owner', price=current_booking.total_price, reason = reason)
+            
+            event_data = {
+                'room': current_booking.rooms.category,
+                'hotelName': current_booking.hotel.name
+            }
+
+            socketio.emit('booking_cancelled', event_data, to=f'user_{current_booking.user_id}')
+            socketio.emit('update_admin_dashboard', to='super_admin')
+            socketio.emit('update_myBookings', to=f'user_{current_booking.user_id}')
+
             flash('Booking cancelled!', 'flash-success')
         else:
             flash('Cancellation is no longer allowed. Bookings can only be cancelled at least 2 days before the check-in date!', 'flash-err')
