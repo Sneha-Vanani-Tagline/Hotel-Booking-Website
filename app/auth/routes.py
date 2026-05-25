@@ -15,6 +15,7 @@ from app.tasks import createMail
 import os
 from dotenv import load_dotenv
 from app.extensions import socketio
+import uuid
 
 
 load_dotenv()
@@ -36,20 +37,19 @@ def register():
         return render_template('register.html', form = form)
 
     if form.validate_on_submit():
-        name = form.name.data
-        email = form.email.data
-        psw = generate_password_hash(form.password.data)
-        role = form.identity.data
-
-        session['email'] = email
+        session['name'] = form.name.data
+        session['email'] = form.email.data
+        session['psw'] = generate_password_hash(form.password.data)
+        session['role'] = form.identity.data
 
         f = form.image.data
         if f and f.filename != '':
-            fname = secure_filename(f.filename)
+            fname = f'{uuid.uuid4()}_{secure_filename(f.filename)}'
             f.save(os.path.join(UPLOAD_FOLDER, fname))
-            User_S.insertUser(name=name, email = email, image=fname, psw = psw, role = role)
+            session['image'] = fname
+
         else:
-            User_S.insertUser(name=name, email = email, psw = psw, role = role)
+            session['image'] = None
       
         return redirect(url_for('auth.verify'))
     else:
@@ -65,7 +65,7 @@ def verify():
     if request.method == 'GET':
         otp = genrateOTP()
         session['otp'] = otp
-
+        print('otp sended',otp)
         createMail.delay(subject='OTP Verification', send=sender_mail, receiver=session['email'], content=f'Your OTP is {otp} from Hotel Booking Website to verify user.')
 
         return render_template('verify.html', form = form)
@@ -76,11 +76,18 @@ def verify():
 
             if session['otp'] == otp:
                 session.pop('otp', None)
-                user = User_S.getUserByMail(session['email'])
 
                 # for forget password
                 if 'forgetPsw' in session:
                     return redirect(url_for('auth.reset_password'))
+                
+                if session['image']:
+                    
+                    User_S.insertUser(name = session['name'], email = session['email'], image=session['image'], psw = session['psw'], role = session['role'])
+                else:
+                    User_S.insertUser(name = session['name'], email = session['email'], psw = session['psw'], role = session['role'])
+                
+                user = User_S.getUserByMail(session['email'])
 
                 User_S.updateVerifyMail(user)
 
