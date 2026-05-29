@@ -10,6 +10,7 @@ from app.models import User_cred, Rooms, Room_facilities, Room_Image, Hotels
 
 UPLOAD_FOLDER = 'app/static/images/'
 
+# Home Route
 @user.route('/')
 @user.route('/home')
 def home():
@@ -33,6 +34,7 @@ def home():
         
     return render_template('home.html', cityWise_room = cityWise_room, roomImg = roomImg)
     
+# Rooms Route
 @user.route('/rooms/<string:city>')
 def rooms(city):
     roomsData = Hotel_S.getAllRooms()
@@ -99,6 +101,7 @@ def search_rooms():
         
     return render_template('rooms.html', rooms = room_list, images = roomwise_img, facilities = roomWise_facility)
 
+# Detailed Room Route
 @user.route('/room/<int:rid>', methods = ['GET', 'POST'])
 def room(rid):
     roomData = Hotel_S.getRoomById(rid)
@@ -146,6 +149,7 @@ def room(rid):
     
     return render_template('detail-room.html', room = roomData, images = images, facilities = facilities)
 
+# Payment Route
 @user.route('/payment')
 @auth_required('user')
 def payment():

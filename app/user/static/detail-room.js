@@ -48,6 +48,21 @@ window.addEventListener('load', function() {
         checkoutF.min = checkinF.value
         validateDates()
     })
+    
     checkoutF.addEventListener('change', validateDates)
+
+
+    // Chat converstion (Web Socket)
+    let message_btn = this.document.querySelector('#detail-room_chat-btn');
+
+    message_btn.addEventListener('click', () => {
+        console.log('"Message host" clicked')
+        data = {
+            'user_id' : window.userId,
+            'host_id' : message_btn.dataset.hostid,
+            'hotel_id' : message_btn.dataset.hotelid
+        }
+        window.socket.emit('create_conversation', data)
+    })
 
 })

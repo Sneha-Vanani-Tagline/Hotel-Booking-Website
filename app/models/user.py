@@ -7,8 +7,11 @@ class User_cred(db.Model):
     image = db.Column(db.String(100), default = 'profile1.png')
     password = db.Column(db.String(255), nullable = False)
     role = db.Column(db.String(15), nullable = False)
-    is_verified = db.Column(db.Boolean, default = False)
+    is_online = db.Column(db.Boolean, default = False)
+    last_seen = db.Column(db.DateTime)
 
     hotels = db.relationship('Hotels', backref = 'host')
     bookings = db.relationship('Bookings', backref = 'user')
+    conversations = db.relationship('Conversation', backref='user')
+
     

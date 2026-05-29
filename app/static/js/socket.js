@@ -1,3 +1,4 @@
+
 window.addEventListener('load', () => {
 
     console.log('Socket JS')
@@ -63,6 +64,26 @@ window.addEventListener('load', () => {
         alert(`New user registered: ${username}`)
     })
     
-   
+    // Socket event
+    window.socket.on('render_message_page', (cid) => {
+
+        // console.log('In new convesation start page')
+        window.location.href = `/chat/${window.userId}?conversation=${cid}`
+        
+    })
+
+    // notifiy user for new message
+    const chat_notification_dot = document.querySelector('.notification-dot');
+
+    socket.on('display_msg_notification', (has_unread_msg) => {
+        // console.log('display_msg_notification event', has_unread_msg)
+        if (has_unread_msg){
+            chat_notification_dot.classList.remove('hidden');
+        }
+        else {
+            chat_notification_dot.classList.add('hidden');
+        }
+    })
+    
 
 });

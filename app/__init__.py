@@ -10,9 +10,10 @@ from .user import user
 from .room import room
 from .profile import profile
 from .booking import booking
+from .chat import chat
 from flask_migrate import Migrate
 from flask import session
-from .models import User_cred, Facilities
+from .models import User_cred, Facilities, Chat_message, Conversation
 from celery import Celery, Task
 from flask_socketio import SocketIO
 
@@ -76,6 +77,7 @@ def create_app():
     app1.register_blueprint(room, url_prefix = '/host/room')
     app1.register_blueprint(profile, url_prefix = '/profile')
     app1.register_blueprint(booking, url_prefix = '/booking')
+    app1.register_blueprint(chat, url_prefix = '/chat')
     
     import app.models   # ✅ triggers all model imports
     import app.tasks

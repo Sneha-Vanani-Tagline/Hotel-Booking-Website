@@ -13,7 +13,6 @@ from app.auth.decorator import auth_required, login_required
 @host.route('/dashboard')
 @auth_required('host')
 def dashboard():
-    print('in host dashboard route')
         
     user = User_S.getUserById(session['user_id'])
     hotel = Hotels.query.filter(Hotels.host_id == user.id).count()

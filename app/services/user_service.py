@@ -1,5 +1,6 @@
 from app import db
 from app.models import User_cred, Hotels, Rooms, Room_facilities, Room_Image, Facilities,Bookings
+from datetime import datetime, timezone
 
 # get User
 def getUserByMail(mail):
@@ -51,3 +52,26 @@ def resetPass(uid, new):
         return True
     else:
         return False
+    
+def makeUser_online(uid):
+    user = User_cred.query.get(uid)
+    user.is_online = True
+    print('in makeUser_online function', user)
+
+    db.session.commit()
+
+def makeUser_offline(uid):
+    print('in makeUser_offline function')
+    user = User_cred.query.get(uid)
+    user.is_online = False
+    db.session.commit()
+
+def update_lastSeen(uid):
+    user = User_cred.query.get(uid)
+    user.last_seen = datetime.now()
+    db.session.commit()
+
+    
+
+
+    

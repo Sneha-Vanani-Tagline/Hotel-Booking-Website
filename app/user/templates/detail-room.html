@@ -44,6 +44,14 @@
                         </div>
 
                         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam neque vitae odit incidunt tenetur corrupti possimus recusandae dolores molestiae officiis! Aliquam, omnis ipsa at commodi error adipisci cupiditate ratione, qui porro quod veniam neque est maiores recusandae autem, assumenda quos alias ipsam repellendus reprehenderit fugiat et! Soluta fugit dicta totam.</p>
+
+                        <!-- Chat Button -->
+                        <div class="d-flex gap-5">
+                            <h5>Host: <strong>{{ room.hotel.host.name }} </strong> </h5>
+                            <a href="#" class="btn btn-outline-secondary" id="detail-room_chat-btn"
+                            data-hotelid="{{ room.hotel_id }}"
+                            data-hostid="{{ room.hotel.host.id }}">Message Host</a>
+                        </div>
                     </div>
 
                     <div class="col-4 pt-5">
