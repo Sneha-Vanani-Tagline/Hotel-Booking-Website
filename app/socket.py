@@ -29,8 +29,10 @@ def join_user(uid):
     print(f'user_{uid} joined')
 
     has_unread_msg = hotel_S.checkUnreadMessages(uid, session['role'])
-    
-    emit('display_msg_notification', has_unread_msg, to=f'user_{uid}')
+    print('in join_user event "FLask"', has_unread_msg)
+
+    if has_unread_msg > 0:
+        emit('display_msg_notification', has_unread_msg, to=f'user_{uid}')
 
 @socketio.on('join_host')
 def join_host(uid):
@@ -39,6 +41,8 @@ def join_host(uid):
     User_S.makeUser_online(uid)
     print(f'host_{uid} joined')
     has_unread_msg = hotel_S.checkUnreadMessages(uid, session['role'])
+    print('in join_host event "FLask"', has_unread_msg)
+
     
     emit('display_msg_notification', has_unread_msg, to=f'host_{uid}')
 
@@ -60,15 +64,30 @@ def save_message(data):
 
     msgData = {
         'msg' : data['msg'],
-        'sender': 'user' if data['sender'] == 'user' else 'host',
+        'sender': data['sender'],
         'created_at': msg_record.created_at.strftime('%I:%M %p'),
         'conversation_id': conversation.id
     }
     # print('message saved "FLASK"')
+
     emit('render_new_chat_message', msgData, to=f'user_{user.id}')
-    # print('New message rendered for user "FLASK"')
-    
+
     emit('render_new_chat_message', msgData, to=f'host_{host.id}')
+
+    # send notification 
+    if data['sender'] == 'user':
+        has_unread_msg = hotel_S.checkUnreadMessages(conversation.host_id, 'host')
+
+        emit('display_msg_notification', has_unread_msg, to=f'host_{conversation.host_id}')
+        print(f'notification send to HOST "Flask"')
+
+    elif data['sender'] == 'host':
+        has_unread_msg = hotel_S.checkUnreadMessages(conversation.user_id, 'user')
+
+        emit('display_msg_notification', has_unread_msg, to=f'user_{conversation.user_id}')
+        print(f'notification send to USER "Flask"')
+
+
 
 @socketio.on('create_conversation')
 def create_conversation(data):
@@ -88,17 +107,5 @@ def readAll(cid, userRole):
         hotel_S.markAll_msg_Read(cid, 'host')
     else:
         hotel_S.markAll_msg_Read(cid, 'user')
-
-@socketio.on('emit_notification_event')
-def emit_notification_event(cid):
-    # print('emit_notification_event in "flask"')
-
-    conversation = hotel_S.getConversation_byId(cid)
-
-    if session['role'] == 'user':
-        emit('display_msg_notification', True, to=f'host_{conversation.host_id}')
-    elif session['role'] == 'host':
-        emit('display_msg_notification', True, to=f'user_{conversation.user_id}')
-        
 
     

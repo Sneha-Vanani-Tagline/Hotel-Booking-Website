@@ -121,14 +121,23 @@ a {
 
 .notification-dot{
     position: absolute;
-    top: 3px;
-    right: -1px;
+    top: -3px;
+    right: -6px;
 
-    width: 10px;
-    height: 10px;
+    min-width: 18px;
+    height: 18px;
 
     background: red;
+    color: white;
     border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px;
 
     border: 2px solid white;
 }
@@ -392,11 +401,6 @@ a {
     font-size: 18px;
     color: #222;
 }
-/* 
-.chat-header-info span{
-    font-size: 14px;
-    color: #d63384;
-} */
 
 
 
@@ -409,6 +413,7 @@ a {
     display: flex;
     flex-direction: column;
     gap: 18px;
+    height: 500px;
 }
 
 /* MESSAGE WRAPPER */

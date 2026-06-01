@@ -353,16 +353,13 @@ def markAll_msg_Read(cid, sender):
 
 def checkUnreadMessages(uid, role):
     if role == 'user':
-        
-        messages = Chat_message.query.join(Conversation).filter(Conversation.user_id == uid, Chat_message.sender != role, Chat_message.is_read == False).all()
+        messages = Chat_message.query.join(Conversation).filter(Conversation.user_id == uid, Chat_message.sender != role, Chat_message.is_read == False).count()
+    
     elif role == 'host':
+        messages = Chat_message.query.join(Conversation).filter(Conversation.host_id == uid, Chat_message.sender != role, Chat_message.is_read == False).count()
 
-        messages = Chat_message.query.join(Conversation).filter(Conversation.host_id == uid, Chat_message.sender != role, Chat_message.is_read == False).all()
-
-    print('unread messages: ', messages)
-    if messages:
-        return True
-    else:
-        return False
+    
+    return messages
+    
 
     

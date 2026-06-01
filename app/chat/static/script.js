@@ -47,13 +47,11 @@ window.addEventListener('load', () => {
 
     // Socket Event to render new Messages
     socket.on('render_new_chat_message', (data) => {
-        // console.log('render_new_chat_message event in JS', data, active_cid)
-        socket.emit('emit_notification_event', data['conversation_id'])
-
+        console.log('render_new_chat_message event in JS', data, active_cid)
 
         let msgSent_by = ''  //sender or reciever
 
-        if (data['sender'] == sender_role.value) {
+        if (data['sender'] == userRole) {
             msgSent_by = 'sender'
         }
         else {
@@ -79,6 +77,10 @@ window.addEventListener('load', () => {
             chat_body.innerHTML += html;
 
             chat_notification_dot.classList.add('hidden');
+
+
+            // Scroll to newest message
+            chat_body.scrollTop = chat_body.scrollHeight;
         }
         
             
@@ -134,6 +136,9 @@ window.addEventListener('load', () => {
                 msg.classList.remove('hidden');
             })
         }
+
+        // Scroll to newest message
+        chat_body.scrollTop = chat_body.scrollHeight;
 
         socket.emit('makeAll_msg_asRead', active_cid, userRole)
         
