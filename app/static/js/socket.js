@@ -74,14 +74,14 @@ window.addEventListener('load', () => {
     const chat_notification_dot = document.querySelector('.notification-dot');
 
     socket.on('display_msg_notification', (has_unread_msg) => {
-        console.log('display_msg_notification event', has_unread_msg)
+        // console.log('display_msg_notification event', has_unread_msg)
         if (has_unread_msg == 0){
-            console.log('display_msg_notification event False-part')
+            // console.log('display_msg_notification event False-part')
             chat_notification_dot.classList.add('hidden');
         }
         else {
 
-            console.log('display_msg_notification event True-part')
+            // console.log('display_msg_notification event True-part')
 
             chat_notification_dot.classList.remove('hidden');
             chat_notification_dot.innerText = has_unread_msg

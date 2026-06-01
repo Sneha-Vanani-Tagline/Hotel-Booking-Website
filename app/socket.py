@@ -79,13 +79,13 @@ def save_message(data):
         has_unread_msg = hotel_S.checkUnreadMessages(conversation.host_id, 'host')
 
         emit('display_msg_notification', has_unread_msg, to=f'host_{conversation.host_id}')
-        print(f'notification send to HOST "Flask"')
+        # print(f'notification send to HOST "Flask"')
 
     elif data['sender'] == 'host':
         has_unread_msg = hotel_S.checkUnreadMessages(conversation.user_id, 'user')
 
         emit('display_msg_notification', has_unread_msg, to=f'user_{conversation.user_id}')
-        print(f'notification send to USER "Flask"')
+        # print(f'notification send to USER "Flask"')
 
 
 

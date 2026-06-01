@@ -47,7 +47,7 @@ window.addEventListener('load', () => {
 
     // Socket Event to render new Messages
     socket.on('render_new_chat_message', (data) => {
-        console.log('render_new_chat_message event in JS', data, active_cid)
+        // console.log('render_new_chat_message event in JS', data, active_cid)
 
         let msgSent_by = ''  //sender or reciever
 
