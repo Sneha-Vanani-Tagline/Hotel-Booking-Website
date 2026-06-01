@@ -1,6 +1,6 @@
 from app import db
-from app.models import User_cred, Hotels, Rooms, Room_facilities, Room_Image, Facilities,Bookings
-from datetime import datetime, timezone
+from app.models import User_cred, Hotels, Rooms, Room_facilities, Room_Image, Facilities,Bookings, Chat_message, Conversation
+from datetime import datetime
 
 # -------------- Hotel table ----------------------
 
@@ -264,7 +264,7 @@ def cancelBooking(bid, reason, cancelledBy):
         booking.status = 'cancelled'
         booking.cancel_reason = reason
         booking.cancelled_by = cancelledBy
-        booking.cancelled_at = datetime.now(timezone.utc)
+        booking.cancelled_at = datetime.now()
         
         db.session.commit()
         
@@ -289,3 +289,77 @@ def checkAvailability(rid, checkin, checkout):
         return True
     else:
         return False
+    
+
+# --------------------- chat ---------------------------
+def getUser_Conversations(id):
+    user = User_cred.query.get(id)
+
+    if user.role == 'host':
+        conversations = Conversation.query.filter(Conversation.host_id == id)
+    elif user.role == 'user':
+        conversations = Conversation.query.filter(Conversation.user_id == id)
+
+    return conversations
+
+
+def getUser_Chat(id):
+    user = User_cred.query.get(id)
+
+    if user.role == 'host':
+        chats = Chat_message.query.join(Conversation).filter(Conversation.host_id == id)
+    elif user.role == 'user':
+        chats = Chat_message.query.join(Conversation).filter(Conversation.user_id == id)
+
+    return chats
+
+def save_ChatMsg(cid, sender, msg):
+    msg = Chat_message(conversation_id = cid, sender = sender, message = msg)
+    db.session.add(msg)
+    db.session.commit()
+
+    return msg
+
+def getConversation_byId(cid):
+    conversation = Conversation.query.get(cid)
+    return conversation
+
+# def getChatMessage_byConversationId(cid):
+#     messages = 
+
+def create_Conversation(user_id, host_id, hotel_id):
+    existing_conversation = Conversation.query.filter(Conversation.user_id == user_id, Conversation.hotel_id == hotel_id, Conversation.host_id == host_id).first()
+
+    if(existing_conversation):
+        return existing_conversation.id
+    else:
+        new = Conversation(user_id=user_id, host_id=host_id, hotel_id=hotel_id)
+        db.session.add(new)
+        db.session.commit()
+
+        return new.id
+    
+
+def markAll_msg_Read(cid, sender):
+    Chat_message.query.filter_by(
+        conversation_id = cid,
+        sender = sender,
+        is_read = False
+    ).update({
+        'is_read' : True
+    })
+    
+    db.session.commit()
+
+def checkUnreadMessages(uid, role):
+    if role == 'user':
+        messages = Chat_message.query.join(Conversation).filter(Conversation.user_id == uid, Chat_message.sender != role, Chat_message.is_read == False).count()
+    
+    elif role == 'host':
+        messages = Chat_message.query.join(Conversation).filter(Conversation.host_id == uid, Chat_message.sender != role, Chat_message.is_read == False).count()
+
+    
+    return messages
+    
+
+    

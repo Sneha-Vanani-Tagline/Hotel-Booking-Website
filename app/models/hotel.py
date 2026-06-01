@@ -13,3 +13,4 @@ class Hotels(db.Model):
     host_id = db.Column(db.Integer, db.ForeignKey('user_cred.id'))
     rooms = db.relationship('Rooms', backref='hotel')
     bookings = db.relationship('Bookings', backref='hotel')
+    conversations = db.relationship('Conversation', backref='hotel')

@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{#
+{% if current_user.role == 'host' %}
+    {% block adminName %} 
+        - {{ current_user.name }}
+    {% endblock %}
+{% endif %}
+#}
+
+{% block content %}
+    {% if conversations %}
+        <div class="chat-container row">
+
+            <!-- When any Conversation is not Selected -->
+            <div class="active-chat-placeholder col-8 d-flex flex-column text-align-center">
+                <p><strong>💬</strong></p>
+                <p>Select a Conversation to start Chatting...</p>
+            </div>
+
+            <!-- Active Chat Area -->
+            <div class="col-8 active-chat-div hidden">
+
+                <!-- Active Chat Header -->
+                 <div class="chat-header">
+                    <div class="chat-header-info">
+
+                        <div>
+                            <h4 id="active-chat-header">Hotel Name / User Name</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CHAT BODY -->
+                <div class="chat-body">
+                    {% for chat in chats %}
+
+                        <div class="message-wrapper 
+                            {% if chat.sender == current_user.role %}
+                                sender
+                            {% else %}
+                                receiver
+                            {% endif %}" data-converid="{{ chat.conversation_id }}">
+
+                            <div class="message">
+
+                                <p>{{ chat.message }}</p>
+
+                                <small>
+                                    {{ chat.created_at.strftime('%I:%M %p') }}
+                                </small>
+
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <!-- CHAT INPUT -->
+                <div class="chat-input-area hidden">
+
+                    <input type="text" value="{{ current_user.role }}" id="sender" hidden>
+                    <input type="text" placeholder="Type your message..." id="input-box">
+
+                    <button id="msd-send-btn">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+
+                </div>
+            </div>
+
+
+
+            <!-- Conversation Sidebar -->
+            <div class="col-4 conversations-div">
+                {% if current_user.role == 'user' %}
+                    {% for conversation in conversations %}
+                        <a href="conversation={{ conversation.id }}" id="conver_{{ conversation.id }}" class="conversation-link"
+                        data-hotel="{{ conversation.hotel.name }}"
+                        data-host="{{ conversation.hotel.host.name }}">
+                            <div>
+                                <h4>{{ conversation.hotel.name }}</h4>
+                                <h6>Host {{ conversation.hotel.host.name }}</h6>
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% elif current_user.role == 'host' %}
+                    {% for conversation in conversations %}
+                        <a href="#" id="conver_{{ conversation.id }}" class="conversation-link"
+                        data-hotel="{{ conversation.hotel.name }}"
+                        data-user="{{ conversation.user.name }}">
+                            <div>
+                                <h4>{{ conversation.user.name }}</h4>
+                                <h6>About {{ conversation.hotel.name }}</h6>
+                            </div>
+                        </a>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        
+
+       
+    {% endif %}
+{% endblock %}
+
+{% block js %} 
+        <script src="{{ url_for('chat.static', filename = 'script.js') }}"></script>
+        
+{% endblock %}

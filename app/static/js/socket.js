@@ -1,3 +1,4 @@
+
 window.addEventListener('load', () => {
 
     console.log('Socket JS')
@@ -63,6 +64,34 @@ window.addEventListener('load', () => {
         alert(`New user registered: ${username}`)
     })
     
-   
+    // Socket event
+    window.socket.on('render_message_page', (cid) => {
+
+        window.location.href = `/chat/${window.userId}?conversation=${cid}`
+    })
+
+    // notifiy user for new message
+    const chat_notification_dot = document.querySelector('.notification-dot');
+
+    socket.on('display_msg_notification', (has_unread_msg) => {
+        // console.log('display_msg_notification event', has_unread_msg)
+        if (has_unread_msg == 0){
+            // console.log('display_msg_notification event False-part')
+            chat_notification_dot.classList.add('hidden');
+        }
+        else {
+
+            // console.log('display_msg_notification event True-part')
+
+            chat_notification_dot.classList.remove('hidden');
+            chat_notification_dot.innerText = has_unread_msg
+            
+        }
+    })
+
+    // socket.onAny((event, ...args) => {
+    //     console.log('RECEIVED EVENT:', event, args);
+    // });
+    
 
 });
