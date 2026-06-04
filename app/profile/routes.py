@@ -13,6 +13,7 @@ UPLOAD_FOLDER = 'app/static/images/'
 @auth_required('user', 'host')
 def view(id):
     user = UserS.getUserById(id)
+
     return render_template('profile.html', data = user)
 
 @profile.route('/edit/<int:id>', methods = ['GET', 'POST'])

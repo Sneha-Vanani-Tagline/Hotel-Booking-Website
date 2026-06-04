@@ -9,12 +9,13 @@ from app.models import User_cred,Hotels, Rooms, Room_Image, Facilities, Room_fac
 import app.services.hotel_service as HotelS
 import app.services.user_service as UserS
 from app.auth.decorator import auth_required, login_required
-
+from app.extensions import cache
 
 UPLOAD_FOLDER = 'app/static/images/rooms/'
 
 @room.route('/roomlist')
 @auth_required('host')
+@cache.cached(100, key_prefix='room_list')
 def roomlist():
     host = UserS.getUserById(session['user_id'])
     hotelData = host.hotels
@@ -22,12 +23,11 @@ def roomlist():
     return render_template('room-list.html', hotel = hotelData)
 
     
-    
 @room.route('/add/<int:hid>', methods = ['GET', 'POST'])
 @auth_required('host')
 def add(hid):
     form = RoomForm()
-    hotelData = HotelS.getHotelsData()
+    hotelData = HotelS.getAllHotels()
     facility = HotelS.getAllFacility()
 
     if form.validate_on_submit():
@@ -48,6 +48,7 @@ def add(hid):
         facility = request.form.getlist('facility')
         HotelS.addRoom(category=category, bedrooms=bedrooms, beds=beds, person=person, price=price, rooms=rooms, hid=hid, images=images, facility = facility)
         
+        cache.delete('room-list')
         flash('New Room Added', 'flash-success')
         return redirect(url_for('room.roomlist'))
 
@@ -91,6 +92,7 @@ def edit(rid):
           
             HotelS.editRoom(rid, updatedData)
 
+            cache.delete('room-list')
             flash('Room Updated', 'flash-success')
             return redirect(url_for('room.roomlist'))
         else:
@@ -102,6 +104,9 @@ def edit(rid):
 @auth_required('host')
 def delete(rid):
     HotelS.deleteRoomById(id)
+
+    cache.delete('room-list')
+
     flash('Room Deleted', 'flash-warn')
     return redirect(url_for('room.roomlist'))
 

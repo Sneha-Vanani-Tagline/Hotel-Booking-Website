@@ -1,7 +1,7 @@
 from flask import Flask, has_request_context
 # from flask_login import login_manager, login_user, logout_user,current_user
 from config import Config
-from .extensions import db, mail, socketio
+from .extensions import db, mail, socketio, cache
 from .auth import auth
 from .admin import admin
 from .host import host
@@ -43,6 +43,7 @@ def create_app():
     mail.init_app(app1)
     celery_init_app(app1)
     socketio.init_app(app1, cors_allowed_origins="*")
+    cache.init_app(app1)
 
     @app1.context_processor
     def inject_user():

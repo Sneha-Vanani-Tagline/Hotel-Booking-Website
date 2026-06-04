@@ -16,6 +16,7 @@ import os
 from dotenv import load_dotenv
 from app.extensions import socketio
 import uuid
+from app.extensions import cache
 
 
 load_dotenv()
@@ -93,6 +94,9 @@ def verify():
 
                 socketio.emit('new_user_registered', user.name, to='super_admin')
                 socketio.emit('update_admin_dashboard', to='super_admin')
+
+                # remove cached data
+                cache.delete('user_list')
 
                 flash('You Registered Successfully', 'flash-success')
 

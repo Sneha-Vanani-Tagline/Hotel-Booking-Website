@@ -1,3 +1,4 @@
+from app.extensions import cache
 from app import db
 from app.models import User_cred, Hotels, Rooms, Room_facilities, Room_Image, Facilities,Bookings
 from datetime import datetime, timezone
@@ -29,14 +30,14 @@ def insertUser(**data):
 
 # Update User record
 def updateUser(data, uid):
-    user = getUserById(uid)
-
+    user = User_cred.query.filter_by(id = uid).first()
+    
     if 'name' in data:
         user.name = data['name']
 
     if data.get('image', None) != None:
         user.image = data['image']
-    
+  
     db.session.commit()
 
 def getUserBooking(id):

@@ -7,13 +7,16 @@ import app.services.hotel_service as Hotel_S
 import app.services.user_service as User_S
 from app.auth.decorator import auth_required, login_required
 from app.models import User_cred, Rooms, Room_facilities, Room_Image, Hotels
+from app.extensions import cache
 
 UPLOAD_FOLDER = 'app/static/images/'
 
 # Home Route
 @user.route('/')
 @user.route('/home')
+@cache.cached(120)
 def home():
+
     rooms = Hotel_S.getAllRooms()
     images = Hotel_S.getAllRoomImages()
     
@@ -36,7 +39,9 @@ def home():
     
 # Rooms Route
 @user.route('/rooms/<string:city>')
+@cache.cached(120)
 def rooms(city):
+
     roomsData = Hotel_S.getAllRooms()
     city = city.lower()
 
@@ -117,6 +122,7 @@ def room(rid):
         facilities.append(f.facility.name)
 
     if request.method == 'POST':
+        print('.....post request....')
 
         checkin = datetime.strptime(
             request.form.get('checkin'), '%Y-%m-%d').date()
@@ -124,6 +130,7 @@ def room(rid):
             request.form.get('checkout'), '%Y-%m-%d').date()
 
         if not(Hotel_S.checkAvailability(rid = rid, checkin=checkin, checkout=checkout)):
+            print('Room is not available..')
             flash('Room is not Available in these dates!', 'flash-err')
             return render_template('detail-room.html', room = roomData, images = images, facilities = facilities)
         else:
@@ -145,8 +152,11 @@ def room(rid):
             session['booking'] = bookingData
             session['rid'] = roomData.id
 
+            print('Booking data stored in session...')
+
             return redirect(url_for('user.payment'))
     
+    print('template randered')
     return render_template('detail-room.html', room = roomData, images = images, facilities = facilities)
 
 # Payment Route

@@ -37,3 +37,6 @@ class Config:
             }
         }
     }
+
+    # Redis caching
+    CACHE_TYPE = 'SimpleCache'

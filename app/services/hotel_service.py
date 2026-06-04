@@ -1,12 +1,8 @@
-from app import db
+from app import db, cache
 from app.models import User_cred, Hotels, Rooms, Room_facilities, Room_Image, Facilities,Bookings, Chat_message, Conversation
 from datetime import datetime
 
 # -------------- Hotel table ----------------------
-
-def getHotelsData():
-    data = Hotels.query.all()
-    return data
 
 def getHotelDataById(hid):
     data = Hotels.query.filter_by(id = hid).first()
@@ -19,6 +15,7 @@ def getAllHotels():
 
 def updateHotelData(id, data):
     hotel = Hotels.query.get(id)
+
     if 'name' in data:
         hotel.name = data['name']
 
@@ -51,6 +48,7 @@ def createHotel(**data):
     db.session.commit()
     print('Hotel Added')
 
+
 def deleteHotel(hid):
     # after bookings module, delete booking details here also
     hotel = getHotelDataById(hid)
@@ -62,6 +60,7 @@ def deleteHotel(hid):
 
     db.session.delete(hotel)
     db.session.commit()
+
 
 # ----------------------- Rooms --------------
 
@@ -81,9 +80,9 @@ def addRoom(**data):
 
 # edit room
 def editRoom(rid, data):
-    room = getRoomById(rid)
-    roomImgs = getRoomImageById(rid)
-    roomFacility = getRoomFacilityByRoomId(rid)
+    room = Rooms.query.get(Rooms.id == rid)
+    # roomImgs = getRoomImageById(rid)
+    # roomFacility = getRoomFacilityByRoomId(rid)
 
     if data.get('category', None) != None:
         room.category = data['category'] 
@@ -154,6 +153,7 @@ def deleteRoomById(rid):
 
     db.session.delete(room)
     db.session.commit()
+
 
 # ----------------------- Facilities -----------------------
 def getAllFacility():
@@ -240,6 +240,7 @@ def addBooking(data):
         b = Bookings(date_of_arrival = data['checkin'], date_of_departure = data['checkout'], nights = data['nights'], bedrooms = data['bedrooms'], guest = data['guest'], total_price = data['totalPrice'], room_id = data['rid'], user_id = data['uid'], status = 'confirmed', hotel_id = data['hid'])
         db.session.add(b)
         db.session.commit()
+
         return b.id
     
     else:
@@ -292,6 +293,7 @@ def checkAvailability(rid, checkin, checkout):
     
 
 # --------------------- chat ---------------------------
+
 def getUser_Conversations(id):
     user = User_cred.query.get(id)
 
@@ -301,7 +303,6 @@ def getUser_Conversations(id):
         conversations = Conversation.query.filter(Conversation.user_id == id)
 
     return conversations
-
 
 def getUser_Chat(id):
     user = User_cred.query.get(id)
@@ -318,14 +319,14 @@ def save_ChatMsg(cid, sender, msg):
     db.session.add(msg)
     db.session.commit()
 
+    cache.delete_memoized(checkUnreadMessages)
+
     return msg
 
 def getConversation_byId(cid):
     conversation = Conversation.query.get(cid)
     return conversation
 
-# def getChatMessage_byConversationId(cid):
-#     messages = 
 
 def create_Conversation(user_id, host_id, hotel_id):
     existing_conversation = Conversation.query.filter(Conversation.user_id == user_id, Conversation.hotel_id == hotel_id, Conversation.host_id == host_id).first()
@@ -351,6 +352,7 @@ def markAll_msg_Read(cid, sender):
     
     db.session.commit()
 
+@cache.memoize(60)
 def checkUnreadMessages(uid, role):
     if role == 'user':
         messages = Chat_message.query.join(Conversation).filter(Conversation.user_id == uid, Chat_message.sender != role, Chat_message.is_read == False).count()

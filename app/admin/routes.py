@@ -14,6 +14,7 @@ from app.tasks import cancelBooking_Mail
 import os
 from dotenv import load_dotenv
 from app.extensions import socketio
+from app.extensions import cache
 
 
 load_dotenv()
@@ -61,6 +62,7 @@ def dashboard():
 # user list
 @admin.route('/userlist')
 @auth_required('admin')
+@cache.cached(120, key_prefix='user_list')
 def userlist():
     users = User_cred.query.filter(User_cred.role != 'admin', User_cred.role != 'host').all()
     hosts = User_cred.query.filter(User_cred.role != 'admin', User_cred.role != 'user').all()
@@ -70,6 +72,7 @@ def userlist():
 # booking list
 @admin.route('/bookinglist', methods = ['POST', 'GET'])
 @auth_required('admin')
+@cache.cached(120, key_prefix='admin_booking_list')
 def bookinglist():
     bookings = Hotel_S.getAllBookings()
 
@@ -93,6 +96,9 @@ def bookinglist():
         socketio.emit('update_host_dashboard', to=f'host_{current_booking.hotel.host_id}')
         socketio.emit('update_myBookings', to=f'user_{current_booking.user_id}')
 
+        cache.delete('host_booking_list')
+        cache.delete('admin_booking_list')
+
         flash('Booking cancelled!', 'flash-success')
 
     return render_template('bookinglist.html', bookings=bookings)
@@ -100,6 +106,7 @@ def bookinglist():
 # hotel request
 @admin.route('/hotellist')
 @auth_required('admin')
+@cache.cached(100, key_prefix='admin_hotel_list')
 def hotellist():
     Hotels = Hotel_S.getAllHotels()
 

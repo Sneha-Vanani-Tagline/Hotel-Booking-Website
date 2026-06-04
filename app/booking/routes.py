@@ -9,6 +9,7 @@ import os
 from dotenv import load_dotenv
 # import app.socket as Socket 
 from app.extensions import socketio
+from app.extensions import cache
 
 load_dotenv()
 sender_mail = os.getenv('MAIL_USERNAME')
@@ -75,6 +76,9 @@ def saveBooking():
 
         flash('Congratulations! Booking Successful', 'flash-success')
 
+        cache.delete('host_booking_list')
+        cache.delete('admin_booking_list')
+
         return redirect(
             url_for(
                 'booking.myBookings',
@@ -113,6 +117,9 @@ def myBookings(uid):
             
             cancelBooking_Mail.delay(subject='Booking Cancelled', send=sender_mail, receiver=session['email'], uname=user.name, bid=current_booking.id, hotel_name=current_booking.hotel.name, room=current_booking.rooms.category, cancel_by= 'You', price=current_booking.total_price, reason = reason)
             
+            cache.delete('host_booking_list')
+            cache.delete('admin_booking_list')
+
             # Updating dashboard
             socketio.emit('update_host_dashboard', to=f'host_{current_booking.hotel.host_id}')
             socketio.emit('update_admin_dashboard', to='super_admin')
@@ -126,6 +133,7 @@ def myBookings(uid):
 # host bookings
 @booking.route('/allBookings', methods = ['GET', 'POST'])
 @auth_required('host')
+@cache.cached(100, key_prefix='host_booking_list')
 def allBookings():
     hostUser = User_S.getUserById(session['user_id'])
     hotels = hostUser.hotels
@@ -152,6 +160,9 @@ def allBookings():
             socketio.emit('booking_cancelled', event_data, to=f'user_{current_booking.user_id}')
             socketio.emit('update_admin_dashboard', to='super_admin')
             socketio.emit('update_myBookings', to=f'user_{current_booking.user_id}')
+
+            cache.delete('host_booking_list')
+            cache.delete('admin_booking_list')
 
             flash('Booking cancelled!', 'flash-success')
         else:

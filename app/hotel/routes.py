@@ -12,13 +12,16 @@ import app.services.hotel_service as Hotel
 import app.services.user_service as User
 from app.auth.decorator import auth_required, login_required
 from app.extensions import socketio
+from app.extensions import cache
 
 UPLOAD_FOLDER = 'app/static/images'
 
 # Display list of hotel
 @hotel.route('/list')
 @auth_required('host')
+@cache.cached(100, key_prefix='host_hotel_list')
 def list():
+    print('Hotel List Database Hit....')
     host = User.getUserById(session['user_id'])
     hotels = host.hotels
     
@@ -48,6 +51,9 @@ def editHotel(id):
             
             Hotel.updateHotelData(id, result)
 
+            cache.delete('host_hotel_list')
+            cache.cached('admin_hotel_list')
+
             flash('Hotel Edited Successfully', 'flash-success')
             return redirect(url_for('hotel.list'))
         else:
@@ -60,6 +66,10 @@ def editHotel(id):
 @auth_required('host')
 def deleteHotel(id):
     Hotel.deleteHotel(id)
+
+    cache.delete('host_hotel_list')
+    cache.delete('admin_hotel_list')
+
     flash('Hotel Deleted', 'flash-success')
     return redirect(url_for('hotel.list'))
 
@@ -92,6 +102,9 @@ def addHotel():
         
         socketio.emit('update_admin_dashboard', to='super_admin')
         
+        cache.delete('host_hotel_list')
+        cache.delete('admin_hotel_list')
+
         flash('Hotel Added Successfully', 'flash-success')
         return redirect(url_for('hotel.list'))
     else:

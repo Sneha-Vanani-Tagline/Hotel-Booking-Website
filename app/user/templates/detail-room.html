@@ -90,7 +90,7 @@
 
                                 <div class="m-3">
                                     {% if current_user %}
-                                            <button type="submit" class="btn w-100" style="background-color: rgb(239, 51, 83);color: white;">Book Now</button>
+                                            <input type="submit" class="btn w-100" style="background-color: rgb(239, 51, 83); color: white;" value="Book Now">
                                         
                                     {% else %}    
                                         <a href="{{ url_for('auth.login') }}" class="btn btn-dark w-100">Login to Book</a>
