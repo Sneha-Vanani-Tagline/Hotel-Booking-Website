@@ -3,13 +3,14 @@ from flask import request, redirect, url_for, render_template, flash, session
 from datetime import date, datetime, timezone
 import app.services.hotel_service as Hotel_S
 import app.services.user_service as User_S
-from app.auth.decorator import auth_required, login_required
+from app.auth.decorator import auth_required
 from app.tasks import bookingSuccess_Mail,cancelBooking_Mail
 import os
 from dotenv import load_dotenv
 # import app.socket as Socket 
 from app.extensions import socketio
 from app.extensions import cache
+from flask_login import current_user
 
 load_dotenv()
 sender_mail = os.getenv('MAIL_USERNAME')
@@ -79,12 +80,7 @@ def saveBooking():
         cache.delete('host_booking_list')
         cache.delete('admin_booking_list')
 
-        return redirect(
-            url_for(
-                'booking.myBookings',
-                uid=session['user_id']
-            )
-        )
+        return redirect(url_for('booking.myBookings'))
 
     else:
 
@@ -92,10 +88,10 @@ def saveBooking():
         return redirect(url_for('user.payment'))
     
 # user panel: mybookings
-@booking.route('/myBookings/<int:uid>', methods = ['GET', 'POST'])
+@booking.route('/myBookings', methods = ['GET', 'POST'])
 @auth_required('user')
-def myBookings(uid):
-    user = User_S.getUserById(uid)
+def myBookings():
+    user = current_user
     bookings = user.bookings
 
     # cancel booking
@@ -135,7 +131,7 @@ def myBookings(uid):
 @auth_required('host')
 @cache.cached(100, key_prefix='host_booking_list')
 def allBookings():
-    hostUser = User_S.getUserById(session['user_id'])
+    hostUser = current_user
     hotels = hostUser.hotels
 
     # cancel booking

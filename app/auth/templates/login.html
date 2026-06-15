@@ -3,7 +3,7 @@
 {% block title %} Login {% endblock %}
 
 {% block content %} 
-    <form action="/auth/login" method="post" id="form">
+    <form action="{{ url_for('auth.login', next = request.args.get('next')) }}" method="post" id="form">
         {{ form.hidden_tag() }}
 
         <div class="input-div form-group mb-3">
@@ -32,6 +32,6 @@
     </p>
     <p> Didn't register? 
         <a href="{{ url_for('auth.register') }}">Register</a> |
-        <a href="{{ url_for('admin.login') }}">Admin?</a>
+        <a href="{{ url_for('admin_bp.login') }}">Admin?</a>
     </p>
 {% endblock %}

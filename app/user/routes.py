@@ -5,9 +5,10 @@ from datetime import date, datetime, timezone
 from werkzeug.utils import secure_filename
 import app.services.hotel_service as Hotel_S
 import app.services.user_service as User_S
-from app.auth.decorator import auth_required, login_required
+from app.auth.decorator import auth_required
 from app.models import User_cred, Rooms, Room_facilities, Room_Image, Hotels
 from app.extensions import cache
+from flask_login import current_user
 
 UPLOAD_FOLDER = 'app/static/images/'
 
@@ -52,6 +53,7 @@ def rooms(city):
     for r in roomsData:
         if r.hotel.city == city:
             cityRoom.append(r)
+
             # fetch image names
             roomWise_img[r.id] = Hotel_S.getRoomImageName_list(r.images)
             roomWise_facility[r.id] = Hotel_S.getRoomFacility_nameList(r.facilities)
@@ -93,14 +95,17 @@ def search_rooms():
             if Hotel_S.checkAvailability(room.id, checkin_date, checkout_date):
 
                 room_list.append(room)
-                # fetch rooms images
+
+                # fetch rooms images, Facilities
                 roomwise_img[room.id] = Hotel_S.getRoomImageName_list(room.images)
                 roomWise_facility[room.id] = Hotel_S.getRoomFacility_nameList(room.facilities)
     
     else:
         for room in rooms:
+
             room_list.append(room)
-            # fetch rooms images
+
+            # fetch rooms images, Facilities
             roomwise_img[room.id] = Hotel_S.getRoomImageName_list(room.images)
             roomWise_facility[room.id] = Hotel_S.getRoomFacility_nameList(room.facilities)
         
@@ -122,7 +127,6 @@ def room(rid):
         facilities.append(f.facility.name)
 
     if request.method == 'POST':
-        print('.....post request....')
 
         checkin = datetime.strptime(
             request.form.get('checkin'), '%Y-%m-%d').date()
@@ -130,7 +134,7 @@ def room(rid):
             request.form.get('checkout'), '%Y-%m-%d').date()
 
         if not(Hotel_S.checkAvailability(rid = rid, checkin=checkin, checkout=checkout)):
-            print('Room is not available..')
+            
             flash('Room is not Available in these dates!', 'flash-err')
             return render_template('detail-room.html', room = roomData, images = images, facilities = facilities)
         else:
@@ -152,11 +156,8 @@ def room(rid):
             session['booking'] = bookingData
             session['rid'] = roomData.id
 
-            print('Booking data stored in session...')
-
             return redirect(url_for('user.payment'))
     
-    print('template randered')
     return render_template('detail-room.html', room = roomData, images = images, facilities = facilities)
 
 # Payment Route

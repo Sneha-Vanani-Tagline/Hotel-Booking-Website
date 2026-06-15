@@ -76,7 +76,7 @@
                                                 </div>
 
                                                 <!-- form: cancel reason -->
-                                                <form action="{{ url_for('booking.myBookings', uid=current_user.id) }}" method="post">
+                                                <form action="{{ url_for('booking.myBookings') }}" method="post">
                                                     <div class="modal-body">
                                                         <h5 class="modal-title fs-6 text-capitalize mb-1" id="cancelModalLabel">{{ room.category }} - {{ room.hotel.name }}</h5>
                                                         

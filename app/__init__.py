@@ -1,9 +1,10 @@
 from flask import Flask, has_request_context
+from flask_admin.theme import Bootstrap4Theme
 # from flask_login import login_manager, login_user, logout_user,current_user
 from config import Config
-from .extensions import db, mail, socketio, cache
+from .extensions import db, mail, socketio, cache, flaskAdmin, login_manager
 from .auth import auth
-from .admin import admin
+from .admin import admin_bp
 from .host import host
 from .hotel import hotel
 from .user import user
@@ -13,10 +14,11 @@ from .booking import booking
 from .chat import chat
 from flask_migrate import Migrate
 from flask import session
-from .models import User_cred, Facilities, Chat_message, Conversation
+from .models import User_cred, Facilities, Bookings, Hotels, Rooms
 from celery import Celery, Task
 from flask_socketio import SocketIO
-
+from .FlaskAdmin import init_admin
+from .FlaskAdmin.views import MyIndexView
 
 
 def celery_init_app(app):
@@ -37,25 +39,24 @@ def create_app():
     # connect config
     app1.config.from_object(Config)
 
-    # db.init
+    # Initialization
     db.init_app(app1)
     migrate = Migrate(app1, db)
     mail.init_app(app1)
     celery_init_app(app1)
     socketio.init_app(app1, cors_allowed_origins="*")
     cache.init_app(app1)
+    flaskAdmin.init_app(
+        app1,
+        index_view=MyIndexView()
+    )
+    login_manager.init_app(app1)
 
-    @app1.context_processor
-    def inject_user():
-        user = None
-        # only access session during real HTTP request(to avoid error in celery)
-        if has_request_context():
+    login_manager.login_view = 'auth.login'
+    login_manager.login_message = 'Please Login First!'
 
-            if 'user_id' in session:
-                user = User_cred.query.get(session['user_id'])
 
-        return dict(current_user=user)
-    
+    # Global Data
     @app1.context_processor
     def global_data():
 
@@ -69,9 +70,10 @@ def create_app():
 
         return dict(global_facilities=facility_name)
 
-    # Bluprints
+
+    # Register Bluprints
     app1.register_blueprint(auth, url_prefix = '/auth')
-    app1.register_blueprint(admin, url_prefix = '/admin')
+    app1.register_blueprint(admin_bp, url_prefix = '/admin')
     app1.register_blueprint(host, url_prefix='/host')
     app1.register_blueprint(hotel, url_prefix='/host/hotel')
     app1.register_blueprint(user)
@@ -79,9 +81,13 @@ def create_app():
     app1.register_blueprint(profile, url_prefix = '/profile')
     app1.register_blueprint(booking, url_prefix = '/booking')
     app1.register_blueprint(chat, url_prefix = '/chat')
-    
-    import app.models   # ✅ triggers all model imports
+
+
+    # Imports 
+    import app.models 
     import app.tasks
     import app.socket
+    init_admin()
+
 
     return app1

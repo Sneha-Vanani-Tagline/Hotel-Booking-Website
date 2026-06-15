@@ -1,0 +1,22 @@
+{% extends 'admin/model/edit.html' %}
+
+{% block body %}
+
+    {{ super() }}
+
+
+    {% if model and model.image %}
+    <div class="alert alert-info">
+        Current Image:
+        <a href="{{ url_for('static',
+                        filename='images/' ~ model.image) }}"
+        target="_blank">
+            {{ model.image }}
+        </a>
+    </div>
+{% endif %} 
+
+{{ super() }}
+
+
+{% endblock %}

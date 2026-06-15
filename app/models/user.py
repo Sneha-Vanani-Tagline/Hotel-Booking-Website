@@ -1,6 +1,8 @@
 from app import db
+from app.extensions import login_manager
+from flask_login import UserMixin
 
-class User_cred(db.Model):
+class User_cred(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(30), nullable = False)
     email = db.Column(db.String(30), nullable = False, unique = True)
@@ -14,4 +16,11 @@ class User_cred(db.Model):
     bookings = db.relationship('Bookings', backref = 'user')
     conversations = db.relationship('Conversation', backref='user')
 
+    def __str__(self):
+        return self.name
+
     
+@login_manager.user_loader
+def load_user(uid):
+
+    return User_cred.query.get(int(uid))

@@ -89,7 +89,7 @@
                                 </div>
 
                                 <div class="m-3">
-                                    {% if current_user %}
+                                    {% if current_user.is_authenticated %}
                                             <input type="submit" class="btn w-100" style="background-color: rgb(239, 51, 83); color: white;" value="Book Now">
                                         
                                     {% else %}    

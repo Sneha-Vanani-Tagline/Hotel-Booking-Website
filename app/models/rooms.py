@@ -15,9 +15,15 @@ class Rooms(db.Model):
     
     bookings = db.relationship('Bookings', backref='rooms')                  # Relationships
     facilities = db.relationship('Room_facilities', backref = 'room')       # Relationships
-    images = db.relationship('Room_Image', backref = 'room')                # Relationships
+    images = db.relationship('Room_Image', backref = 'room', cascade = "all, delete, delete-orphan")                # Relationships
+
+    def __str__(self):
+        return self.category
 
 class Room_Image(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id'))      # Foreign Keys
+    room_id = db.Column(db.Integer, db.ForeignKey('rooms.id', ondelete = "CASCADE"))     # Foreign Keys
     image = db.Column(db.String, nullable = False)
+
+    def __str__(self):
+        return self.image

@@ -8,8 +8,9 @@ from werkzeug.utils import secure_filename
 from app.models import User_cred,Hotels, Rooms, Room_Image, Facilities, Room_facilities
 import app.services.hotel_service as HotelS
 import app.services.user_service as UserS
-from app.auth.decorator import auth_required, login_required
+from app.auth.decorator import auth_required
 from app.extensions import cache
+from flask_login import current_user
 
 UPLOAD_FOLDER = 'app/static/images/rooms/'
 
@@ -17,8 +18,8 @@ UPLOAD_FOLDER = 'app/static/images/rooms/'
 @auth_required('host')
 @cache.cached(100, key_prefix='room_list')
 def roomlist():
-    host = UserS.getUserById(session['user_id'])
-    hotelData = host.hotels
+    
+    hotelData = current_user.hotels
 
     return render_template('room-list.html', hotel = hotelData)
 
@@ -174,9 +175,7 @@ def checkUpdate(existingRoomData, existingFacilityId, existingImagesName, catego
         
 
     if updateFlag == False:
-        print('not changed')
         return False
     else:
-        print('changed')
         return updatedFields
 

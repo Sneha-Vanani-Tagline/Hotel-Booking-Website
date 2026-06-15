@@ -7,14 +7,15 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import User_cred,Hotels, Rooms, Room_Image, Facilities, Room_facilities, Bookings
 import app.services.hotel_service as hotel_S
 import app.services.user_service as User_S
-from app.auth.decorator import auth_required, login_required
+from app.auth.decorator import auth_required
+from flask_login import current_user
 
 
 @host.route('/dashboard')
 @auth_required('host')
 def dashboard():
         
-    user = User_S.getUserById(session['user_id'])
+    user = current_user
     hotel = Hotels.query.filter(Hotels.host_id == user.id).count()
     total_rooms = 0
 

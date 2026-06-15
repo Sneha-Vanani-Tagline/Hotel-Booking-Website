@@ -14,3 +14,7 @@ class Hotels(db.Model):
     rooms = db.relationship('Rooms', backref='hotel')
     bookings = db.relationship('Bookings', backref='hotel')
     conversations = db.relationship('Conversation', backref='hotel')
+
+
+    def __str__(self):
+        return self.name

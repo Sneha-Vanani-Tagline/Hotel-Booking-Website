@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    {% if current_user %}
+    {% if current_user.is_authenticated %}
     <p class="hidden user_id">{{ current_user.id }}</p>
     {% endif %}
 

@@ -1,4 +1,4 @@
-from . import admin
+from . import admin_bp
 from flask import flash, session, render_template, redirect, url_for, request
 from app.admin.form import LoginForm
 import random
@@ -9,25 +9,25 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import User_cred, Bookings, Hotels, Rooms
 import app.services.user_service as User_S
 import app.services.hotel_service as Hotel_S
-from app.auth.decorator import auth_required, login_required
+from app.auth.decorator import auth_required
 from app.tasks import cancelBooking_Mail
 import os
 from dotenv import load_dotenv
 from app.extensions import socketio
 from app.extensions import cache
+from flask_login import current_user, login_user
 
 
 load_dotenv()
 sender_mail = os.getenv('MAIL_USERNAME')
 
 
-# Get Admin User
-def getUser(mail):
-    user = User_cred.query.filter_by(email=mail).first()
-    return user
+# # Get Admin User
+# def getUser(mail):
+#     return user
 
 # Login Route
-@admin.route('/login', methods = ['GET', 'POST'])
+@admin_bp.route('/login', methods = ['GET', 'POST'])
 def login():
     form = LoginForm()
 
@@ -38,16 +38,20 @@ def login():
         email = form.email.data
         password = form.password.data
 
-        user = getUser(email)
+        user = User_cred.query.filter_by(email=mail).first()
 
         if check_password_hash(user.password, password):
+
+            login_user(user)
+
             flash('✅ Successfully Loged In.','flash-success')
-            return redirect(url_for('admin.dashboard'))     # One bug here: it is redirected to the auth/result route after login
+            return redirect(url_for('admin_bp.dashboard'))     # One bug here: it is redirected to the auth/result route after login
+        
         else:
             flash('Invalid Details', 'flash-err')
             return render_template('login.html', form = form)
 
-@admin.route('/dashboard')
+@admin_bp.route('/dashboard')
 @auth_required('admin')
 def dashboard():
     today = date.today()
@@ -60,7 +64,7 @@ def dashboard():
     return render_template('dashboard.html', users=users, hotels=hotels, bookings=bookings, cancelBookings = cancelBooking, completedBooking = completedBooking)
 
 # user list
-@admin.route('/userlist')
+@admin_bp.route('/userlist')
 @auth_required('admin')
 @cache.cached(120, key_prefix='user_list')
 def userlist():
@@ -70,7 +74,7 @@ def userlist():
     return render_template('userlist.html', users = users, hosts = hosts)
 
 # booking list
-@admin.route('/bookinglist', methods = ['POST', 'GET'])
+@admin_bp.route('/bookinglist', methods = ['POST', 'GET'])
 @auth_required('admin')
 @cache.cached(120, key_prefix='admin_booking_list')
 def bookinglist():
@@ -104,7 +108,7 @@ def bookinglist():
     return render_template('bookinglist.html', bookings=bookings)
 
 # hotel request
-@admin.route('/hotellist')
+@admin_bp.route('/hotellist')
 @auth_required('admin')
 @cache.cached(100, key_prefix='admin_hotel_list')
 def hotellist():

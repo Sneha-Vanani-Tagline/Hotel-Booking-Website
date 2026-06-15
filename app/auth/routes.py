@@ -1,5 +1,5 @@
 from . import auth
-from flask import flash, session, render_template, redirect, url_for, request
+from flask import flash, session, render_template, redirect, url_for, request, abort
 from app.auth.forms import RegistrationForm, LoginForm, VerifyOTPForm, ResetPassForm, ForgetPassResetForm
 import random
 import os
@@ -10,13 +10,15 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import User_cred
 import app.services.hotel_service as Hotel_S
 import app.services.user_service as User_S
-from .decorator import auth_required, login_required
+# from .decorator import auth_required, login_required
 from app.tasks import createMail
 import os
 from dotenv import load_dotenv
 from app.extensions import socketio
 import uuid
 from app.extensions import cache
+from flask_login import login_required, logout_user, login_user
+from urllib.parse import urljoin, urlparse
 
 
 load_dotenv()
@@ -45,7 +47,7 @@ def register():
 
         f = form.image.data
         if f and f.filename != '':
-            fname = f'{uuid.uuid4()}_{secure_filename(f.filename)}'
+            fname = secure_filename(f.filename)
             f.save(os.path.join(UPLOAD_FOLDER, fname))
             session['image'] = fname
 
@@ -66,7 +68,7 @@ def verify():
     if request.method == 'GET':
         otp = genrateOTP()
         session['otp'] = otp
-        print('otp sended',otp)
+
         createMail.delay(subject='OTP Verification', send=sender_mail, receiver=session['email'], content=f'Your OTP is {otp} from Hotel Booking Website to verify user.')
 
         return render_template('verify.html', form = form)
@@ -98,6 +100,11 @@ def verify():
                 # remove cached data
                 cache.delete('user_list')
 
+                session.pop('name', None)
+                session.pop('email', None)
+                session.pop('psw', None)
+                session.pop('role', None)
+
                 flash('You Registered Successfully', 'flash-success')
 
                 createMail.delay(subject='Registeration Success', send=sender_mail, receiver=session['email'], content=f'You are Registered successfully in Hotel Booking Website')
@@ -112,6 +119,16 @@ def verify():
     else:
         flash('Please Login first', 'flash-err')
         return redirect(url_for('auth.login'))
+
+
+def is_safe_url(target):
+    ref_url = urlparse(request.host_url)
+    target_url = urlparse(urljoin(request.host_url, target))
+
+    return (
+        target_url.scheme in ['http', 'https'] and
+        ref_url.netloc == target_url.netloc
+    )
 
 # Login route
 @auth.route('/login', methods = ['GET', 'POST'])
@@ -129,16 +146,25 @@ def login():
 
         if user:
             if check_password_hash(user.password, password):
-                session['user_id'] = user.id
-                session['email'] = user.email
-                session['role'] = user.role
+
+                login_user(user)
 
                 flash('Loged In.','flash-success')
+
+                next_page = request.args.get('next')
+
+                print(next_page)
+
+                if next_page and not is_safe_url(next_page):  
+                    abort(400)
+                
+                if next_page:
+                    return redirect(next_page)
 
                 if user.role == 'host':
                     return redirect(url_for('host.dashboard'))
                 elif user.role == 'admin':
-                    return redirect(url_for('admin.dashboard'))
+                    return redirect(url_for('admin_bp.dashboard'))
                 else:
                     return redirect(url_for('user.home'))
             else:
@@ -153,9 +179,13 @@ def login():
 @auth.route('/logout')
 @login_required
 def logout():
+
+    logout_user()
+
     session.pop('user_id', None)
     session.pop('email', None)
     session.pop('role', None)
+
     return redirect(url_for('auth.login'))
 
 # Forget Password
@@ -188,7 +218,7 @@ def reset_password():
         user = User_S.getUserByMail(session['email'])
        
         if 'forgetPsw' in session:
-            # print('in forgot password reset', user.id)
+            
             session.pop('forgetPsw', None)
 
             if User_S.resetPass(uid=user.id, new=generate_password_hash(new_pass)):
@@ -209,7 +239,7 @@ def reset_password():
         if check_password_hash(user.password, exsiting_pass):
             if User_S.resetPass(uid=user.id, new=generate_password_hash(new_pass)):
                 flash('Password Changed Successfully!', 'flash-success')
-                return redirect(url_for('profile.view', id = user.id))
+                return redirect(url_for('profile.view'))
                 
         else: 
             flash('Invalid existing Password', 'flash-err')

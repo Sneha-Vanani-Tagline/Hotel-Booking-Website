@@ -5,38 +5,38 @@ import os
 from werkzeug.utils import secure_filename
 import app.services.hotel_service as HotelS
 import app.services.user_service as UserS
-from app.auth.decorator import auth_required, login_required
+from app.auth.decorator import auth_required
+from flask_login import current_user
 
 UPLOAD_FOLDER = 'app/static/images/'
 
-@profile.route('/<int:id>')
+@profile.route('/')
 @auth_required('user', 'host')
-def view(id):
-    user = UserS.getUserById(id)
+def view():
 
-    return render_template('profile.html', data = user)
+    return render_template('profile.html', data = current_user)
 
-@profile.route('/edit/<int:id>', methods = ['GET', 'POST'])
+@profile.route('/edit', methods = ['GET', 'POST'])
 @auth_required('user', 'host')
-def edit(id):
-    user = UserS.getUserById(id)
-    form = UserForm(obj = user)
+def edit():
+
+    form = UserForm(obj = current_user)
     
     if form.validate_on_submit():
         name = form.name.data
         image = form.image.data
 
-        result = check_profile_changes(name, image, user)
+        result = check_profile_changes(name, image, current_user)
 
         if result:
                 UserS.updateUser(result, id)
                 flash('Details Updated', 'flash-success')
-                return redirect(url_for('profile.view', id = id))
+                return redirect(url_for('profile.view'))
         else:
             flash('No changes found!', 'flash-warn')
-            return render_template('edit-user.html', form = form, data=user,userImage=user.image)
+            return render_template('edit-user.html', form = form, data=current_user,userImage=current_user.image)
     
-    return render_template('edit-user.html', form = form, data=user, userImage=user.image)
+    return render_template('edit-user.html', form = form, data=current_user, userImage=current_user.image)
     
 def check_profile_changes(name, image, userData):
     changeFlag = False

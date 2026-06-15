@@ -5,11 +5,11 @@
 {% endblock %}
 
 {% block content %}
-    {% if current_user %}
+    {% if current_user.is_authenticated %}
     
         <div class="stats d-flex gap-4 text-center align-items-stretch">
 
-            <a href="{{ url_for('admin.userlist') }}">
+            <a href="{{ url_for('admin_bp.userlist') }}">
                 <div class="card p-3" style="width: 12rem;">Total Users
                     <span class="fs-3">
                         {% if users %}
@@ -21,7 +21,7 @@
                 </div> 
             </a>
         
-            <a href="{{ url_for('admin.hotellist') }}">
+            <a href="{{ url_for('admin_bp.hotellist') }}">
                 <div class="card p-3" style="width: 12rem;">Total Hotels
                     <span class="fs-3">
                         {% if hotels %}
@@ -33,7 +33,7 @@
                 </div> 
             </a>
 
-            <a href="{{ url_for('admin.bookinglist') }}">
+            <a href="{{ url_for('admin_bp.bookinglist') }}">
                 <div class="card p-3" style="width: 12rem;">Total Active Bookings
                     <span class="fs-3">
                         {% if bookings %}
@@ -45,7 +45,7 @@
                 </div> 
             </a>
 
-            <a href="{{ url_for('admin.bookinglist') }}">
+            <a href="{{ url_for('admin_bp.bookinglist') }}">
                 <div class="card p-3" style="width: 12rem;">Total Completed Bookings
                     <span class="fs-3">
                         {% if completedBooking %}
@@ -57,7 +57,7 @@
                 </div> 
             </a>
 
-            <a href="{{ url_for('admin.bookinglist') }}">
+            <a href="{{ url_for('admin_bp.bookinglist') }}">
                 <div class="card p-3" style="width: 12rem;">Total Cancelled Bookings
                     <span class="fs-3">
                         {% if cancelBookings %}

@@ -10,9 +10,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import User_cred,Hotels, Rooms, Room_Image, Facilities, Room_facilities
 import app.services.hotel_service as Hotel
 import app.services.user_service as User
-from app.auth.decorator import auth_required, login_required
+from app.auth.decorator import auth_required
 from app.extensions import socketio
 from app.extensions import cache
+from flask_login import current_user
 
 UPLOAD_FOLDER = 'app/static/images'
 
@@ -21,8 +22,8 @@ UPLOAD_FOLDER = 'app/static/images'
 @auth_required('host')
 @cache.cached(100, key_prefix='host_hotel_list')
 def list():
-    print('Hotel List Database Hit....')
-    host = User.getUserById(session['user_id'])
+
+    host = current_user
     hotels = host.hotels
     
     return render_template('hotel.html', data = hotels)
@@ -83,7 +84,7 @@ def addHotel():
         return render_template('hotel_form.html', form = form, action='Add', submit = 'Add')
     
     if form.validate_on_submit():
-        host = User.getUserByMail(session['email'])
+        host = current_user
 
         name = form.name.data
         desc = form.description.data

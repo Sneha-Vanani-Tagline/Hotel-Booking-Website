@@ -6,6 +6,7 @@ from .host import routes as host_R
 from flask import request, redirect, render_template,session
 import app.services.hotel_service as hotel_S
 import app.services.user_service as User_S
+from flask_login import current_user
 
 from datetime import datetime, timezone
 
@@ -16,8 +17,8 @@ def connect():
 
 @socketio.on('disconnect')
 def disconnect():
-    User_S.makeUser_offline(session['user_id'])
-    User_S.update_lastSeen(session['user_id'])
+    User_S.makeUser_offline(current_user.id)
+    User_S.update_lastSeen(current_user.id)
 
     print('Socket Disconnected')
 
@@ -28,7 +29,7 @@ def join_user(uid):
     User_S.makeUser_online(uid)
     print(f'user_{uid} joined')
 
-    has_unread_msg = hotel_S.checkUnreadMessages(uid, session['role'])
+    has_unread_msg = hotel_S.checkUnreadMessages(uid, current_user.role)
     print('in join_user event "FLask"', has_unread_msg)
 
     if has_unread_msg > 0:
@@ -40,7 +41,7 @@ def join_host(uid):
     join_room(f'host_{uid}')
     User_S.makeUser_online(uid)
     print(f'host_{uid} joined')
-    has_unread_msg = hotel_S.checkUnreadMessages(uid, session['role'])
+    has_unread_msg = hotel_S.checkUnreadMessages(uid, current_user.role)
     print('in join_host event "FLask"', has_unread_msg)
 
     

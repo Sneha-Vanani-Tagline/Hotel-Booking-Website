@@ -1,5 +1,5 @@
 from . import chat
-from app.auth.decorator import auth_required, login_required
+from app.auth.decorator import auth_required
 from flask import redirect, url_for, render_template, flash, session, request
 import app.services.hotel_service as hotel_S
 

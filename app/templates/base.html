@@ -24,7 +24,7 @@
                     {% block adminName %} {% endblock %}
                 </a>
 
-                {% if (not current_user) or (current_user.role == 'user') %}
+                {% if (not current_user.is_authenticated) or (current_user.role == 'user') %}
                     <!-- search bar -->
                     <div class="search-bar-container d-flex justify-content-center">
                         <form class="search-bar d-flex align-items-center" action="{{ url_for('user.search_rooms') }}" method="get">
@@ -65,7 +65,7 @@
                 {% endif %}
 
                 <!-- Logout icon / chat icon-->
-                {% if current_user %}
+                {% if current_user.is_authenticated %}
                     <div class="mb-1 d-flex">
                         {% if current_user.role != 'admin' %}
                             <div class="mx-3">
@@ -91,7 +91,7 @@
 
 
         <div class="row">
-            {% if current_user %}
+            {% if current_user.is_authenticated %}
                 <!-- side navbar -->
                 <div class="col-lg-2 col-md-3 bg-white d-flex flex-column nav-div">
                     <nav class="nav-link-container">
@@ -104,20 +104,20 @@
                             
                             <div class="nav-link-div"> <a href="{{ url_for('hotel.list') }}">Hotels</a> </div>
                             <div class="nav-link-div"> <a href="{{ url_for('room.roomlist') }}">Rooms</a> </div>
-                            <div class="nav-link-div"> <a href="{{ url_for('profile.view', id = current_user.id) }}">My Profile</a>  </div>
+                            <div class="nav-link-div"> <a href="{{ url_for('profile.view') }}">My Profile</a>  </div>
                         {% endif %}    
 
                         {% if current_user.role == 'user' %}
                             <div class="nav-link-div"> <a href="{{ url_for('user.home') }}">Home</a>  </div>
-                            <div class="nav-link-div"> <a href="{{ url_for('booking.myBookings', uid = current_user.id) }}">My Bookings</a>  </div>
-                            <div class="nav-link-div"> <a href="{{ url_for('profile.view', id = current_user.id) }}">My Profile</a>  </div>
+                            <div class="nav-link-div"> <a href="{{ url_for('booking.myBookings') }}">My Bookings</a>  </div>
+                            <div class="nav-link-div"> <a href="{{ url_for('profile.view') }}">My Profile</a>  </div>
                         {% endif %}
 
                         {% if current_user.role == 'admin' %}
-                            <div class="nav-link-div"> <a href="{{ url_for('admin.dashboard') }}">Dashboard</a>  </div>
-                            <div class="nav-link-div"> <a href="{{ url_for('admin.userlist') }}">Users</a>  </div>
-                            <div class="nav-link-div"> <a href="{{ url_for('admin.hotellist') }}">Hotels</a>  </div>
-                            <div class="nav-link-div"> <a href="{{ url_for('admin.bookinglist') }}">Bookings</a>  </div>
+                            <div class="nav-link-div"> <a href="{{ url_for('admin_bp.dashboard') }}">Dashboard</a>  </div>
+                            <div class="nav-link-div"> <a href="{{ url_for('admin_bp.userlist') }}">Users</a>  </div>
+                            <div class="nav-link-div"> <a href="{{ url_for('admin_bp.hotellist') }}">Hotels</a>  </div>
+                            <div class="nav-link-div"> <a href="{{ url_for('admin_bp.bookinglist') }}">Bookings</a>  </div>
                             
                         {% endif %}
                     </nav>
@@ -208,7 +208,7 @@
     </div>
 
 
-    {% if current_user %}
+    {% if current_user.is_authenticated %}
     <script>
         window.userId = "{{ current_user.id }}"
         window.userRole = "{{ current_user.role }}"
