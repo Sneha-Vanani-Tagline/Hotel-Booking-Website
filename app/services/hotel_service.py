@@ -1,6 +1,7 @@
 from app import db, cache
-from app.models import User_cred, Hotels, Rooms, Room_facilities, Room_Image, Facilities,Bookings, Chat_message, Conversation
+from app.models import User_cred, Hotels, Rooms, Room_facilities, Room_Image, Facilities,Bookings, Chat_message, Conversation,Audit_logs
 from datetime import datetime
+from flask_login import current_user
 
 # -------------- Hotel table ----------------------
 
@@ -80,7 +81,7 @@ def addRoom(**data):
 
 # edit room
 def editRoom(rid, data):
-    room = Rooms.query.get(Rooms.id == rid)
+    room = Rooms.query.get(rid)
     # roomImgs = getRoomImageById(rid)
     # roomFacility = getRoomFacilityByRoomId(rid)
 
@@ -239,7 +240,14 @@ def addBooking(data):
         
         b = Bookings(date_of_arrival = data['checkin'], date_of_departure = data['checkout'], nights = data['nights'], bedrooms = data['bedrooms'], guest = data['guest'], total_price = data['totalPrice'], room_id = data['rid'], user_id = data['uid'], status = 'confirmed', hotel_id = data['hid'])
         db.session.add(b)
+        db.session.flush()
+
+        log = Audit_logs(action = 'BOOKING_CREATED', user_id = data['uid'], record_id = b.id, table_name = 'bookings')
+        db.session.add(log)
+
         db.session.commit()
+
+        print(f'\nAudit : Booking Created-{b.id}\n')
 
         return b.id
     
@@ -266,10 +274,15 @@ def cancelBooking(bid, reason, cancelledBy):
         booking.cancel_reason = reason
         booking.cancelled_by = cancelledBy
         booking.cancelled_at = datetime.now()
-        
+        db.session.flush()
+
+        log = Audit_logs(action='BOOKING_CANCELLED', user_id = current_user.id, record_id = bid, table_name = 'bookings')
+        db.session.add(log)
+
         db.session.commit()
-        
-    return False
+
+        print(f'\nAudit : Booking Cancelled-{bid}\n')
+ 
 
 def checkAvailability(rid, checkin, checkout):
     
@@ -364,4 +377,9 @@ def checkUnreadMessages(uid, role):
     return messages
     
 
-    
+# --------------------- Audit logs ---------------------------
+
+def getAuditLogs():
+    logs = Audit_logs.query.all()
+
+    return logs

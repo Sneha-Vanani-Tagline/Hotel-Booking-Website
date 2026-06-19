@@ -29,7 +29,7 @@ def edit():
         result = check_profile_changes(name, image, current_user)
 
         if result:
-                UserS.updateUser(result, id)
+                UserS.updateUser(result, current_user.id)
                 flash('Details Updated', 'flash-success')
                 return redirect(url_for('profile.view'))
         else:

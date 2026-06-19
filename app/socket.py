@@ -7,7 +7,6 @@ from flask import request, redirect, render_template,session
 import app.services.hotel_service as hotel_S
 import app.services.user_service as User_S
 from flask_login import current_user
-
 from datetime import datetime, timezone
 
 

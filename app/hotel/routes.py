@@ -55,6 +55,9 @@ def editHotel(id):
             cache.delete('host_hotel_list')
             cache.cached('admin_hotel_list')
 
+            socketio.emit('update_hotellist', to='super_admin')
+
+
             flash('Hotel Edited Successfully', 'flash-success')
             return redirect(url_for('hotel.list'))
         else:
@@ -67,6 +70,8 @@ def editHotel(id):
 @auth_required('host')
 def deleteHotel(id):
     Hotel.deleteHotel(id)
+
+    socketio.emit('update_hotellist', to='super_admin')
 
     cache.delete('host_hotel_list')
     cache.delete('admin_hotel_list')
@@ -102,6 +107,7 @@ def addHotel():
             Hotel.createHotel(name= name, description=desc, type=type, city=city, location=location, host_id = host.id)
         
         socketio.emit('update_admin_dashboard', to='super_admin')
+        socketio.emit('update_hotellist', to='super_admin')
         
         cache.delete('host_hotel_list')
         cache.delete('admin_hotel_list')

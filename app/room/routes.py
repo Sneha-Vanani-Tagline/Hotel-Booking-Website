@@ -104,11 +104,11 @@ def edit(rid):
 @room.route('/delete/<int:rid>')
 @auth_required('host')
 def delete(rid):
-    HotelS.deleteRoomById(id)
+    HotelS.deleteRoomById(rid)
 
     cache.delete('room-list')
 
-    flash('Room Deleted', 'flash-warn')
+    flash('Room Deleted', 'flash-suceess')
     return redirect(url_for('room.roomlist'))
 
 # edit same data validation

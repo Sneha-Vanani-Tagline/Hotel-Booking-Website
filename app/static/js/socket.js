@@ -41,6 +41,27 @@ window.addEventListener('load', () => {
         
         alert(`You have new booking in ${data.hotelName}, booked by: ${data.bookerName}`)
         
+        if (window.location.pathname == '/admin/bookinglist' || 
+            window.location.pathname == '/booking/allBookings' ) 
+        {
+            location.reload()
+        }
+    })
+
+    socket.on('booking_cancelled', (data) => {
+        alert(`Your ${data.room} booking in ${data.hotelName} has been cancelled.`)
+    
+        if (window.location.pathname == '/admin/bookinglist' ||
+            window.location.pathname == '/booking/allBookings'
+        ) {
+            location.reload()
+        }
+    })
+
+    socket.on('update_myBookings', () => {
+        if(window.location.pathname == '/booking/myBookings') {
+            location.reload();
+        }
     })
 
     socket.on('update_host_dashboard', () => {
@@ -56,12 +77,20 @@ window.addEventListener('load', () => {
         }
     })
 
-    socket.on('booking_cancelled', (data) => {
-        alert(`Your ${data.room} booking in ${data.hotelName} has been cancelled.`)
+    socket.on('update_hotellist', () => {
+        if (window.location.pathname == '/admin/hotellist') {
+            location.reload();
+        }
     })
+
+    
 
     socket.on('new_user_registered', (username) => {
         alert(`New user registered: ${username}`)
+
+        if (window.location.pathname == '/admin/userlist') {
+            location.reload()
+        }
     })
     
     // Socket event
@@ -70,22 +99,26 @@ window.addEventListener('load', () => {
         window.location.href = `/chat/${window.userId}?conversation=${cid}`
     })
 
+    socket.on('update_actionLogs', () => {
+        if (window.location.pathname == '/admin/audit-logs') {
+            location.reload();
+            console.log('Audit : Audit Log Update');
+
+        }
+    })
+
     // notifiy user for new message
     const chat_notification_dot = document.querySelector('.notification-dot');
 
     socket.on('display_msg_notification', (has_unread_msg) => {
-        // console.log('display_msg_notification event', has_unread_msg)
+        
         if (has_unread_msg == 0){
-            // console.log('display_msg_notification event False-part')
             chat_notification_dot.classList.add('hidden');
         }
         else {
 
-            // console.log('display_msg_notification event True-part')
-
             chat_notification_dot.classList.remove('hidden');
             chat_notification_dot.innerText = has_unread_msg
-            
         }
     })
 

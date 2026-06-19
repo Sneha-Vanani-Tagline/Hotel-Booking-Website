@@ -15,6 +15,7 @@ class User_cred(db.Model, UserMixin):
     hotels = db.relationship('Hotels', backref = 'host')
     bookings = db.relationship('Bookings', backref = 'user')
     conversations = db.relationship('Conversation', backref='user')
+    audit_logs = db.relationship('Audit_logs', backref = 'user')
 
     def __str__(self):
         return self.name

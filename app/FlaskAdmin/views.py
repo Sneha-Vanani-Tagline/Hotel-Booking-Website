@@ -285,6 +285,7 @@ class RoomView(SecureAdmin, ModelView):
     ]
 
     column_list = [
+
         'category',
         'bedrooms',
         'beds',
@@ -329,4 +330,5 @@ class RoomView(SecureAdmin, ModelView):
 
                 model.images.append(obj)
 
-
+class AuditLogView(SecureAdmin, ModelView):
+    pass

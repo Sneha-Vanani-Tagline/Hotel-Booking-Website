@@ -4,7 +4,7 @@ from app.auth.forms import RegistrationForm, LoginForm, VerifyOTPForm, ResetPass
 import random
 import os
 from flask_mail import Message
-from app import mail,db
+from app import mail, db
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import User_cred
@@ -17,8 +17,9 @@ from dotenv import load_dotenv
 from app.extensions import socketio
 import uuid
 from app.extensions import cache
-from flask_login import login_required, logout_user, login_user
+from flask_login import login_required, logout_user, login_user, current_user
 from urllib.parse import urljoin, urlparse
+from app.models.audit import Audit_logs
 
 
 load_dotenv()
@@ -100,14 +101,14 @@ def verify():
                 # remove cached data
                 cache.delete('user_list')
 
+                flash('You Registered Successfully', 'flash-success')
+
+                createMail.delay(subject='Registeration Success', send=sender_mail, receiver=session['email'], content=f'You are Registered successfully in Hotel Booking Website')
+
                 session.pop('name', None)
                 session.pop('email', None)
                 session.pop('psw', None)
                 session.pop('role', None)
-
-                flash('You Registered Successfully', 'flash-success')
-
-                createMail.delay(subject='Registeration Success', send=sender_mail, receiver=session['email'], content=f'You are Registered successfully in Hotel Booking Website')
 
                 return redirect(url_for('auth.login'))
             else:
@@ -151,9 +152,13 @@ def login():
 
                 flash('Loged In.','flash-success')
 
-                next_page = request.args.get('next')
+                # add audit record
+                result = User_S.login_audit(uid = user.id, action = 'login')
 
-                print(next_page)
+                if result:
+                    print(f'\nAudit: {user.id} loged in\n')
+
+                next_page = request.args.get('next')
 
                 if next_page and not is_safe_url(next_page):  
                     abort(400)
@@ -179,6 +184,12 @@ def login():
 @auth.route('/logout')
 @login_required
 def logout():
+
+    # logout audit
+    result = User_S.logout_audit(current_user.id, 'logout')
+    
+    if result:
+        print(f'\nAudit: {current_user.id} Loged Out\n')
 
     logout_user()
 

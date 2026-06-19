@@ -22,10 +22,6 @@ load_dotenv()
 sender_mail = os.getenv('MAIL_USERNAME')
 
 
-# # Get Admin User
-# def getUser(mail):
-#     return user
-
 # Login Route
 @admin_bp.route('/login', methods = ['GET', 'POST'])
 def login():
@@ -51,6 +47,7 @@ def login():
             flash('Invalid Details', 'flash-err')
             return render_template('login.html', form = form)
 
+# DASHBOARD
 @admin_bp.route('/dashboard')
 @auth_required('admin')
 def dashboard():
@@ -115,3 +112,10 @@ def hotellist():
     Hotels = Hotel_S.getAllHotels()
 
     return render_template('hotellist.html', Hotels=Hotels)
+
+@admin_bp.route('/audit-logs')
+@auth_required('admin')
+def audit_logs():
+    logs = Hotel_S.getAuditLogs()
+
+    return render_template('audit_logs.html', logs = logs)

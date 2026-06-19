@@ -23,7 +23,7 @@ def saveBooking():
 
     if 'rid' in session and 'booking' in session:
 
-        user = User_S.getUserById(session['user_id'])
+        user = current_user
         room = Hotel_S.getRoomById(session['rid'])
         bookingData = session['booking']
 
@@ -41,7 +41,7 @@ def saveBooking():
 
     data['bedrooms'] = room.bedrooms
     data['rid'] = room.id
-    data['uid'] = session['user_id']
+    data['uid'] = current_user.id
     data['hid'] = room.hotel_id
 
     result = Hotel_S.addBooking(data)
@@ -111,7 +111,7 @@ def myBookings():
         if diff >= 2:
             Hotel_S.cancelBooking(bid=bid, reason=reason, cancelledBy=cancelled_by)
             
-            cancelBooking_Mail.delay(subject='Booking Cancelled', send=sender_mail, receiver=session['email'], uname=user.name, bid=current_booking.id, hotel_name=current_booking.hotel.name, room=current_booking.rooms.category, cancel_by= 'You', price=current_booking.total_price, reason = reason)
+            cancelBooking_Mail.delay(subject='Booking Cancelled', send=sender_mail, receiver=current_user.email, uname=user.name, bid=current_booking.id, hotel_name=current_booking.hotel.name, room=current_booking.rooms.category, cancel_by= 'You', price=current_booking.total_price, reason = reason)
             
             cache.delete('host_booking_list')
             cache.delete('admin_booking_list')

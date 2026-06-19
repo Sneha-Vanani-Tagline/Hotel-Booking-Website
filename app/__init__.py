@@ -19,6 +19,7 @@ from celery import Celery, Task
 from flask_socketio import SocketIO
 from .FlaskAdmin import init_admin
 from .FlaskAdmin.views import MyIndexView
+from .events import register_events
 
 
 def celery_init_app(app):
@@ -26,6 +27,7 @@ def celery_init_app(app):
         def __call__(self, *args, **kwargs):
             with app.app_context():
                 return self.run(*args, **kwargs)
+            
     celery_app = Celery(app.name, task_cls=FlaskTask)
     celery_app.config_from_object(app.config['CELERY'])
     celery_app.set_default()
@@ -88,6 +90,7 @@ def create_app():
     import app.tasks
     import app.socket
     init_admin()
+    register_events()
 
 
     return app1
